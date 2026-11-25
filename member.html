@@ -1,0 +1,450 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Dashboard | Zomba Welfare Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--teal:#2E7382;--teal-dark:#225967;--white:#fff;--grey:#F4F4F4;--text:#333;--muted:#777;--border:#e8ecee;--shadow:0 5px 22px rgba(0,0,0,.055)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--grey);color:var(--text);font-family:Inter,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+#loader{position:fixed;inset:0;background:#fff;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.logo-loader{width:66px;height:66px;background:var(--teal);color:#fff;border-radius:21px;display:grid;place-items:center;font-size:24px;font-weight:800;animation:pulse 1.4s infinite}
+.spinner{width:27px;height:27px;border:3px solid #e5eeee;border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:scale(1.08);box-shadow:0 0 0 12px #2e738215}}
+#app{display:none;min-height:100vh}
+.sidebar{width:250px;background:#fff;position:fixed;inset:0 auto 0 0;padding:25px 17px;border-right:1px solid var(--border);z-index:20;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:11px;padding:0 8px 27px}
+.brand-icon{background:var(--teal);color:#fff;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-weight:800}
+.brand h3{font-size:15px;margin:0 0 4px}.brand small{font-size:11px;color:var(--muted)}
+.nav-label{font-size:10px;color:#999;font-weight:700;letter-spacing:1.2px;padding:12px 10px}
+.nav-btn{border:0;background:transparent;width:100%;padding:12px 13px;border-radius:10px;display:flex;align-items:center;gap:12px;color:#626b70;text-align:left;font-size:13px;margin:3px 0}
+.nav-btn.active,.nav-btn:hover{background:#eaf3f4;color:var(--teal);font-weight:700}
+.nav-icon{width:20px;text-align:center;font-size:17px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:15px}
+.profile-mini{display:flex;align-items:center;gap:10px;padding:10px}
+.avatar{width:37px;height:37px;background:#e3f0f1;color:var(--teal);border-radius:50%;display:grid;place-items:center;font-weight:700}
+.profile-mini strong{font-size:12px;display:block}.profile-mini small{font-size:10px;color:var(--muted)}
+.main{margin-left:250px;padding:27px 32px;max-width:1600px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:15px}
+.topbar h2{font-size:22px;margin:0 0 6px}.topbar p{font-size:12px;color:var(--muted);margin:0}
+.top-actions{display:flex;align-items:center;gap:12px}
+.icon-btn{width:40px;height:40px;border:1px solid var(--border);background:#fff;border-radius:12px}
+.mobile-menu{display:none}
+.section{display:none}.section.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.welcome{background:linear-gradient(115deg,#225967,#2E8794);color:white;border-radius:17px;padding:25px 27px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.welcome h2{font-size:21px;margin:0 0 8px}.welcome p{font-size:12px;opacity:.85;margin:0}
+.welcome-mark{font-size:45px;opacity:.7}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:22px}
+.stat,.panel{background:#fff;border:1px solid var(--border);border-radius:15px;padding:19px;box-shadow:var(--shadow)}
+.stat-top{display:flex;justify-content:space-between;align-items:center}
+.stat-icon{width:37px;height:37px;border-radius:11px;background:#eaf3f4;display:grid;place-items:center;color:var(--teal);font-size:18px}
+.stat h3{font-size:23px;margin:16px 0 5px}.stat p{font-size:11px;color:var(--muted);margin:0}
+.content-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:17px}
+.panel{margin-bottom:17px;min-width:0}
+.panel-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px;gap:10px}
+.panel-heading h3{font-size:14px;margin:0}
+.panel-heading button,.text-btn{border:0;background:none;color:var(--teal);font-size:11px;font-weight:700}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;white-space:nowrap}
+th{text-align:left;font-size:10px;color:#888;padding:11px 9px;border-bottom:1px solid var(--border)}
+td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
+.empty{text-align:center;color:#888;padding:28px 10px;font-size:12px}
+.status{display:inline-block;padding:5px 9px;border-radius:20px;font-size:10px;background:#f0f1f1;color:#777}
+.status.paid,.status.verified{background:#e7f5ed;color:#23834c}
+.status.pending{background:#fff5df;color:#9b6a0a}
+.status.rejected{background:#fceaea;color:#bd4141}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.action{padding:15px;border:1px solid var(--border);border-radius:12px;background:#fff;text-align:left}
+.action:hover{border-color:var(--teal)}
+.action span{font-size:20px;display:block;margin-bottom:9px}
+.action strong{font-size:12px;display:block}.action small{font-size:10px;color:var(--muted)}
+.notice{background:#edf5f5;border-radius:11px;padding:14px;font-size:11px;line-height:1.7;color:#345d64}
+.page-title{font-size:20px;margin:0 0 7px}.page-subtitle{font-size:12px;color:var(--muted);margin:0 0 20px}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;font-size:11px;font-weight:700;margin-bottom:7px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px;border:1px solid #dfe5e6;border-radius:9px;background:#fff;outline:none;font-size:12px}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal)}
+.primary-btn{background:var(--teal);color:#fff;border:0;border-radius:9px;padding:12px 18px;font-size:12px;font-weight:700}
+.primary-btn:hover{background:var(--teal-dark)}
+.secondary-btn{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 15px;font-size:12px}
+.wallet-number{font-size:28px;font-weight:800;color:var(--teal);margin:12px 0}
+.toast{position:fixed;bottom:20px;right:20px;background:#263b40;color:#fff;padding:13px 18px;border-radius:10px;font-size:12px;z-index:200;display:none;max-width:90%}
+#mobileOverlay{display:none}
+@media(max-width:950px){.stats{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}}
+@media(max-width:700px){
+.sidebar{transform:translateX(-100%);transition:.25s;width:265px;box-shadow:var(--shadow)}
+.sidebar.open{transform:translateX(0)}
+#mobileOverlay.show{display:block;position:fixed;inset:0;background:#0006;z-index:15}
+.main{margin:0;padding:19px 15px}
+.mobile-menu{display:block}
+.topbar{margin-bottom:20px}.topbar h2{font-size:19px}
+.welcome{padding:20px}.welcome h2{font-size:18px}.welcome-mark{font-size:33px}
+.stats{gap:10px}.stat{padding:14px}.stat h3{font-size:20px}
+}
+@media(max-width:380px){.stats{grid-template-columns:1fr 1fr}.stat p{font-size:10px}}
+</style>
+</head>
+<body>
+<div id="loader">
+ <div class="logo-loader">ZW</div>
+ <strong>Zomba Welfare Management</strong>
+ <div class="spinner"></div>
+ <small style="color:#888;font-size:11px">Loading your dashboard...</small>
+</div>
+
+<div id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+<div id="app">
+<aside class="sidebar" id="sidebar">
+ <div class="brand">
+  <div class="brand-icon">ZW</div>
+  <div><h3>Zomba Welfare</h3><small>Together, we care.</small></div>
+ </div>
+ <div class="nav-label">MEMBER MENU</div>
+ <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">⌂</span> Dashboard</button>
+ <button class="nav-btn" data-page="contributions"><span class="nav-icon">▤</span> My Contributions</button>
+ <button class="nav-btn" data-page="submit"><span class="nav-icon">＋</span> Submit Payment</button>
+ <button class="nav-btn" data-page="wallet"><span class="nav-icon">◈</span> My Welfare Wallet</button>
+ <button class="nav-btn" data-page="history"><span class="nav-icon">◷</span> Payment History</button>
+ <button class="nav-btn" data-page="activities"><span class="nav-icon">♡</span> Welfare Activities</button>
+ <div class="sidebar-bottom">
+  <div class="profile-mini">
+   <div class="avatar" id="sideAvatar">M</div>
+   <div style="min-width:0"><strong id="sideName">Member</strong><small>Welfare Member</small></div>
+  </div>
+  <button class="nav-btn" id="logoutBtn"><span class="nav-icon">↪</span> Sign Out</button>
+ </div>
+</aside>
+
+<main class="main">
+ <header class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+   <button class="icon-btn mobile-menu" onclick="toggleSidebar()">☰</button>
+   <div><h2 id="pageHeading">Dashboard</h2><p id="todayText">Your welfare account overview</p></div>
+  </div>
+  <div class="top-actions">
+   <div class="avatar" id="topAvatar">M</div>
+  </div>
+ </header>
+
+<section class="section active" id="page-dashboard">
+ <div class="welcome">
+  <div><h2 id="welcomeName">Welcome back!</h2><p>Here is an overview of your welfare account.</p></div>
+  <div class="welcome-mark">♡</div>
+ </div>
+ <div class="stats">
+  <div class="stat"><div class="stat-top"><span class="stat-icon">◈</span></div><h3 id="totalContributions">MWK 0</h3><p>Total verified contributions</p></div>
+  <div class="stat"><div class="stat-top"><span class="stat-icon">!</span></div><h3 id="outstandingBalance">MWK 0</h3><p>Outstanding balance</p></div>
+  <div class="stat"><div class="stat-top"><span class="stat-icon">◷</span></div><h3 id="pendingPayments">0</h3><p>Pending payment submissions</p></div>
+  <div class="stat"><div class="stat-top"><span class="stat-icon">✓</span></div><h3 id="monthsPaid">0</h3><p>Fully paid months</p></div>
+ </div>
+ <div class="content-grid">
+  <div class="panel">
+   <div class="panel-heading"><h3>Recent Payments</h3><button onclick="showPage('history')">View all</button></div>
+   <div class="table-wrap"><table><thead><tr><th>Reference</th><th>Amount</th><th>Status</th></tr></thead><tbody id="recentPayments"><tr><td colspan="3" class="empty">Loading payments...</td></tr></tbody></table></div>
+  </div>
+  <div>
+   <div class="panel">
+    <div class="panel-heading"><h3>Quick Actions</h3></div>
+    <div class="quick-actions">
+     <button class="action" onclick="showPage('submit')"><span>＋</span><strong>Submit Payment</strong><small>Record a contribution</small></button>
+     <button class="action" onclick="showPage('contributions')"><span>▤</span><strong>My Contributions</strong><small>View monthly records</small></button>
+     <button class="action" onclick="showPage('wallet')"><span>◈</span><strong>My Wallet</strong><small>Check available credit</small></button>
+     <button class="action" onclick="showPage('activities')"><span>♡</span><strong>Welfare Activities</strong><small>See welfare updates</small></button>
+    </div>
+   </div>
+   <div class="panel">
+    <div class="panel-heading"><h3>Contribution Reminder</h3></div>
+    <div class="notice">Monthly welfare contribution is MWK 7,000. The payment window runs from the 24th to the last day of each month. Please ensure payments are submitted on time.</div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="page-contributions">
+ <h2 class="page-title">My Contributions</h2><p class="page-subtitle">Your monthly welfare contribution obligations and payment status.</p>
+ <div class="panel">
+  <div class="table-wrap"><table><thead><tr><th>Month</th><th>Contribution</th><th>Penalty</th><th>Total Due</th><th>Paid</th><th>Status</th></tr></thead><tbody id="contributionRows"><tr><td colspan="6" class="empty">Loading records...</td></tr></tbody></table></div>
+ </div>
+</section>
+
+<section class="section" id="page-submit">
+ <h2 class="page-title">Submit Payment</h2><p class="page-subtitle">Paste your transaction confirmation message to submit a payment for verification.</p>
+ <div class="content-grid">
+  <div class="panel">
+   <div class="form-group"><label>Contribution month</label><select id="paymentMonth"><option value="">Select contribution month</option></select></div>
+   <div class="form-group"><label>Full transaction SMS</label><textarea id="paymentSms" rows="6" placeholder="Paste the complete Airtel Money, TNM Mpamba or National Bank transaction message here..."></textarea></div>
+   <div class="notice" style="margin-bottom:15px">The system will extract the transaction details for review. Transaction charges are not counted as contributions. Your payment will remain pending until the administrator verifies receipt of the funds.</div>
+   <button class="primary-btn" id="submitPaymentBtn">Submit for Verification</button>
+   <p id="submitMessage" style="font-size:11px;margin-top:12px"></p>
+  </div>
+  <div class="panel">
+   <div class="panel-heading"><h3>Official Welfare Accounts</h3></div>
+   <p style="font-size:12px;line-height:2"><strong>Airtel Money</strong><br>0999966269</p>
+   <p style="font-size:12px;line-height:2"><strong>TNM Mpamba</strong><br>0881606602</p>
+   <p style="font-size:12px;line-height:2"><strong>National Bank</strong><br>1001738174</p>
+   <div class="notice">Always confirm the receiving account before making a transfer. Only submit genuine transaction messages.</div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="page-wallet">
+ <h2 class="page-title">My Welfare Wallet</h2><p class="page-subtitle">Your unallocated verified payment credit.</p>
+ <div class="panel">
+  <span style="font-size:12px;color:#777">Available wallet credit</span>
+  <div class="wallet-number" id="walletBalance">MWK 0</div>
+  <p style="font-size:11px;color:#777">Excess payments remain here until allocated by the administrator to an eligible contribution month.</p>
+ </div>
+ <div class="panel">
+  <div class="panel-heading"><h3>Wallet Transactions</h3></div>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Amount</th></tr></thead><tbody id="walletRows"><tr><td colspan="3" class="empty">Loading wallet transactions...</td></tr></tbody></table></div>
+ </div>
+</section>
+
+<section class="section" id="page-history">
+ <h2 class="page-title">Payment History</h2><p class="page-subtitle">All payment submissions and their verification status.</p>
+ <div class="panel">
+  <div class="table-wrap"><table><thead><tr><th>Date Submitted</th><th>Transaction Reference</th><th>Amount</th><th>Month</th><th>Status</th></tr></thead><tbody id="historyRows"><tr><td colspan="5" class="empty">Loading payment history...</td></tr></tbody></table></div>
+ </div>
+</section>
+
+<section class="section" id="page-activities">
+ <h2 class="page-title">Welfare Activities</h2><p class="page-subtitle">Updates and information about team welfare activities.</p>
+ <div class="panel"><div class="empty">No welfare activities have been published yet.</div></div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+
+const SUPABASE_URL='https://emmdhxlcqbvpvpjsmshz.supabase.co';
+const SUPABASE_KEY='sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm';
+
+let db=null;
+let currentUser=null;
+let profile=null;
+let obligations=[];
+let payments=[];
+
+const $=id=>document.getElementById(id);
+const money=value=>'MWK '+Number(value||0).toLocaleString('en-US');
+const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dateText=value=>value?new Date(value).toLocaleDateString('en-GB'):'—';
+const monthText=value=>{
+ if(!value)return '—';
+ const d=new Date(value+'T00:00:00');
+ return d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+};
+const toast=message=>{
+ $('toast').textContent=message;
+ $('toast').style.display='block';
+ setTimeout(()=>$('toast').style.display='none',3500);
+};
+const showError=message=>{
+ $('loader').innerHTML='<div class="logo-loader">ZW</div><strong>Unable to load dashboard</strong><p style="font-size:12px;color:#777;max-width:300px;text-align:center">'+escapeHTML(message)+'</p><button class="primary-btn" onclick="location.reload()">Try Again</button><button class="secondary-btn" onclick="location.href=\'index.html\'">Return to Login</button>';
+};
+const hideLoader=()=>{
+ $('loader').style.display='none';
+ $('app').style.display='block';
+};
+
+async function initialise(){
+ try{
+  if(!window.supabase?.createClient)throw new Error('Supabase library could not load. Check your internet connection.');
+  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+  const {data:{session},error:sessionError}=await db.auth.getSession();
+  if(sessionError)throw sessionError;
+  if(!session){location.replace('index.html');return;}
+  currentUser=session.user;
+
+  const {data:roleData,error:roleError}=await db.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
+  if(roleError)throw roleError;
+  if(roleData?.role!=='member'){
+   if(roleData?.role==='administrator')location.replace('admin.html');
+   else location.replace('index.html');
+   return;
+  }
+
+  const {data:profileData,error:profileError}=await db.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
+  if(profileError)throw profileError;
+  profile=profileData||{};
+  const name=profile.full_name||currentUser.email?.split('@')[0]||'Member';
+  $('welcomeName').textContent='Welcome back, '+name+'!';
+  $('sideName').textContent=name;
+  $('sideAvatar').textContent=name.charAt(0).toUpperCase();
+  $('topAvatar').textContent=name.charAt(0).toUpperCase();
+  $('todayText').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  bindNavigation();
+  hideLoader();
+  await loadDashboard();
+  populateMonths();
+ }catch(error){
+  console.error(error);
+  showError(error.message||'An unexpected error occurred.');
+ }
+}
+
+function bindNavigation(){
+ document.querySelectorAll('.nav-btn[data-page]').forEach(button=>{
+  button.addEventListener('click',()=>showPage(button.dataset.page));
+ });
+ $('logoutBtn').addEventListener('click',async()=>{
+  const {error}=await db.auth.signOut();
+  if(error){toast(error.message);return;}
+  location.replace('index.html');
+ });
+ $('submitPaymentBtn').addEventListener('click',submitPayment);
+}
+
+window.showPage=async page=>{
+ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+ document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+ $('page-'+page)?.classList.add('active');
+ const titles={dashboard:'Dashboard',contributions:'My Contributions',submit:'Submit Payment',wallet:'My Welfare Wallet',history:'Payment History',activities:'Welfare Activities'};
+ $('pageHeading').textContent=titles[page]||'Dashboard';
+ $('sidebar').classList.remove('open');
+ $('mobileOverlay').classList.remove('show');
+ if(page==='dashboard'||page==='contributions'||page==='history'||page==='wallet')await loadDashboard();
+};
+
+window.toggleSidebar=()=>{
+ $('sidebar').classList.toggle('open');
+ $('mobileOverlay').classList.toggle('show');
+};
+
+async function loadDashboard(){
+ try{
+  const [obRes,payRes,walletRes]=await Promise.all([
+   db.from('contribution_obligations').select('*').eq('member_id',currentUser.id).order('contribution_month',{ascending:false}),
+   db.from('payment_submissions').select('*').eq('member_id',currentUser.id).order('created_at',{ascending:false}),
+   db.from('member_wallet_transactions').select('*').eq('member_id',currentUser.id).order('created_at',{ascending:false})
+  ]);
+  if(obRes.error)throw obRes.error;
+  if(payRes.error)throw payRes.error;
+  if(walletRes.error)throw walletRes.error;
+  obligations=obRes.data||[];
+  payments=payRes.data||[];
+  const walletRows=walletRes.data||[];
+
+  const totalPaid=obligations.reduce((sum,o)=>sum+Number(o.amount_paid||0),0);
+  const outstanding=obligations.reduce((sum,o)=>sum+Math.max(0,Number(o.amount_due||0)-Number(o.amount_paid||0)),0);
+  const pending=payments.filter(p=>p.status==='pending').length;
+  const paid=obligations.filter(o=>o.status==='paid').length;
+  const wallet=walletRows.reduce((sum,t)=>sum+Number(t.amount||0),0);
+
+  $('totalContributions').textContent=money(totalPaid);
+  $('outstandingBalance').textContent=money(outstanding);
+  $('pendingPayments').textContent=pending;
+  $('monthsPaid').textContent=paid;
+  $('walletBalance').textContent=money(wallet);
+
+  renderRecent();
+  renderObligations();
+  renderPayments();
+  renderWallet(walletRows);
+ }catch(error){
+  console.error(error);
+  toast('Could not load records: '+error.message);
+ }
+}
+
+function statusHTML(status){
+ const s=String(status||'unpaid').toLowerCase();
+ return '<span class="status '+escapeHTML(s)+'">'+escapeHTML(s.charAt(0).toUpperCase()+s.slice(1))+'</span>';
+}
+function renderRecent(){
+ const rows=payments.slice(0,5);
+ $('recentPayments').innerHTML=rows.length?rows.map(p=>`<tr><td>${escapeHTML(p.transaction_id||p.transaction_reference||'—')}</td><td>${money(p.amount)}</td><td>${statusHTML(p.status)}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">No payment submissions yet.</td></tr>';
+}
+function renderObligations(){
+ $('contributionRows').innerHTML=obligations.length?obligations.map(o=>`<tr><td>${escapeHTML(monthText(o.contribution_month))}</td><td>${money(o.base_amount_due)}</td><td>${money(o.penalty_amount_due)}</td><td>${money(o.amount_due)}</td><td>${money(o.amount_paid)}</td><td>${statusHTML(o.status)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No contribution obligations have been generated yet.</td></tr>';
+}
+function renderPayments(){
+ $('historyRows').innerHTML=payments.length?payments.map(p=>`<tr><td>${dateText(p.created_at)}</td><td>${escapeHTML(p.transaction_id||p.transaction_reference||'—')}</td><td>${money(p.amount)}</td><td>${escapeHTML(monthText(p.contribution_month))}</td><td>${statusHTML(p.status)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">No payment history yet.</td></tr>';
+}
+function renderWallet(rows){
+ $('walletRows').innerHTML=rows.length?rows.map(t=>`<tr><td>${dateText(t.created_at)}</td><td>${escapeHTML(t.description||t.transaction_type||'Wallet transaction')}</td><td>${money(t.amount)}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">No wallet transactions yet.</td></tr>';
+}
+
+function populateMonths(){
+ const select=$('paymentMonth');
+ select.innerHTML='<option value="">Select contribution month</option>';
+ obligations.filter(o=>o.status!=='paid').forEach(o=>{
+  const option=document.createElement('option');
+  option.value=o.id;
+  option.textContent=monthText(o.contribution_month)+' — '+money(Math.max(0,Number(o.amount_due||0)-Number(o.amount_paid||0)));
+  select.appendChild(option);
+ });
+}
+
+async function submitPayment(){
+ const obligationId=$('paymentMonth').value;
+ const sms=$('paymentSms').value.trim();
+ const message=$('submitMessage');
+ if(!obligationId||!sms){message.style.color='#bd4141';message.textContent='Select a contribution month and paste the transaction SMS.';return;}
+ const obligation=obligations.find(o=>o.id===obligationId);
+ if(!obligation){message.style.color='#bd4141';message.textContent='Selected contribution month could not be found. Refresh the page.';return;}
+
+ const button=$('submitPaymentBtn');
+ button.disabled=true;button.textContent='Submitting...';
+ message.textContent='';
+ try{
+  const {data,error}=await db.functions.invoke('parse-payment-sms',{body:{message:sms,contribution_month:obligation.contribution_month}});
+  if(error)throw error;
+  const parsed=data?.parsed||data?.data||data;
+  if(!parsed)throw new Error('The SMS parser returned no transaction details.');
+
+  const transactionId=parsed.transaction_id||parsed.reference||parsed.transaction_reference;
+  const amount=Number(parsed.amount||parsed.transaction_amount);
+  if(!transactionId||!Number.isFinite(amount)||amount<=0)throw new Error('The parser could not identify a valid transaction reference and amount. Please check the SMS.');
+
+  if(parsed.recipient_match===false||parsed.recipient_matches===false||parsed.recipient_mismatch){
+   throw new Error('The SMS recipient does not match an official welfare receiving account. Please check the transfer details.');
+  }
+  if(parsed.requires_manual_review===true||parsed.manual_review===true){
+   throw new Error('This SMS requires administrator review before it can be submitted. Contact the administrator.');
+  }
+
+  const outstanding=Number(obligation.amount_due||0)-Number(obligation.amount_paid||0);
+  if(amount<outstanding)throw new Error('Partial payments are not accepted. The selected month requires '+money(outstanding)+'.');
+  const {error:insertError}=await db.from('payment_submissions').insert({
+   member_id:currentUser.id,
+   contribution_obligation_id:obligation.id,
+   contribution_month:obligation.contribution_month,
+   amount:amount,
+   transaction_id:transactionId,
+   original_message:sms,
+   status:'pending'
+  });
+  if(insertError)throw insertError;
+  message.style.color='#23834c';
+  message.textContent='Payment submitted successfully. It is awaiting administrator verification.';
+  $('paymentSms').value='';
+  $('paymentMonth').value='';
+  await loadDashboard();
+  populateMonths();
+ }catch(error){
+  console.error(error);
+  message.style.color='#bd4141';
+  message.textContent=error.message||'Unable to submit payment.';
+ }finally{
+  button.disabled=false;button.textContent='Submit for Verification';
+ }
+}
+
+initialise();
+})();
+</script>
+</body>
+</html>
