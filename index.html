@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2E7382">
+  <title>Zomba Welfare Management</title>
+  <style>
+    :root{--teal:#2E7382;--teal-dark:#205866;--bg:#f4f6f7;--ink:#263238;--muted:#68777d;--line:#e1e8ea;--white:#fff;--good:#176b45;--bad:#a23b36}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    .top{background:var(--teal);color:#fff;padding:24px 18px 34px}.top-inner{max-width:960px;margin:auto}.brand{font-weight:750;font-size:21px;letter-spacing:.1px}.tag{opacity:.9;margin-top:3px;font-size:13px}
+    main{max-width:960px;margin:-17px auto 40px;padding:0 16px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 5px 18px rgba(25,55,65,.045)}
+    h1{font-size:22px;margin:0 0 5px}h2{font-size:18px;margin:0 0 12px}p{margin:5px 0 14px;color:var(--muted)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    label{display:block;font-weight:650;font-size:13px;margin:12px 0 6px}input,textarea{width:100%;border:1px solid #cbd7da;border-radius:10px;padding:12px 13px;font:inherit;background:#fff;color:var(--ink);outline:none}
+    input:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(46,115,130,.12)}textarea{min-height:145px;resize:vertical}
+    button{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--teal);color:#fff;margin-top:14px}button:hover{background:var(--teal-dark)}button.secondary{background:#e8f0f1;color:var(--teal-dark)}button:disabled{opacity:.55;cursor:wait}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.status{padding:11px 13px;border-radius:10px;background:#eef3f4;color:#42545a;margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}.status.good{background:#eaf5ef;color:var(--good)}.status.bad{background:#fff0ef;color:var(--bad)}
+    .hidden{display:none!important}.small{font-size:12px;color:var(--muted)}.result{background:#f7f9f9;border:1px solid var(--line);border-radius:10px;padding:13px;margin-top:12px;overflow-wrap:anywhere}.result dl{display:grid;grid-template-columns: minmax(130px, .8fr) 1.2fr;gap:7px;margin:0}.result dt{color:var(--muted)}.result dd{margin:0;font-weight:650}.notice{border-left:4px solid var(--teal);padding:10px 12px;background:#f0f6f7;border-radius:5px;color:#40565d;font-size:13px}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 16px 25px}
+    @media(max-width:680px){.grid{grid-template-columns:1fr}.card{padding:18px}.top{padding:20px 16px 30px}main{padding:0 12px}.result dl{grid-template-columns:1fr;gap:2px}.result dd{margin-bottom:8px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="top-inner"><div class="brand">Zomba Welfare Management</div><div class="tag">Together, we care.</div></div></header>
+  <main>
+    <section class="card">
+      <h1>Welcome</h1>
+      <p>Sign in to test the secure payment SMS parser. This starter page is for authentication and parser testing only.</p>
+      <div class="notice">A parsed SMS is not proof that money reached the welfare account. All payments still require treasurer verification.</div>
+    </section>
+
+    <section class="grid" id="authForms">
+      <div class="card">
+        <h2>Sign in</h2>
+        <form id="loginForm">
+          <label for="loginEmail">Email address</label><input id="loginEmail" type="email" autocomplete="email" required>
+          <label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" required>
+          <button id="loginBtn" type="submit">Sign in</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>Create an account</h2>
+        <p class="small">New accounts receive the member role. Email verification may be required before sign-in.</p>
+        <form id="signupForm">
+          <label for="fullName">Full name</label><input id="fullName" autocomplete="name" required>
+          <label for="phone">Phone number</label><input id="phone" type="tel" autocomplete="tel">
+          <label for="signupEmail">Personal email</label><input id="signupEmail" type="email" autocomplete="email" required>
+          <label for="signupPassword">Password</label><input id="signupPassword" type="password" minlength="8" autocomplete="new-password" required>
+          <button id="signupBtn" type="submit">Create account</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="card hidden" id="sessionPanel">
+      <div class="row" style="justify-content:space-between">
+        <div><h2>Signed in</h2><div id="userEmail" class="small"></div></div>
+        <button id="logoutBtn" class="secondary" type="button">Sign out</button>
+      </div>
+      <div class="notice" style="margin-top:14px">Paste the original transaction SMS below. The extracted fields are displayed for review only; this page does not submit or verify a payment.</div>
+    </section>
+
+    <section class="card hidden" id="parserPanel">
+      <h2>Test payment SMS parser</h2>
+      <label for="smsMessage">Original transaction SMS</label>
+      <textarea id="smsMessage" maxlength="5000" placeholder="Paste the complete Airtel Money, TNM Mpamba or National Bank SMS here..."></textarea>
+      <div class="row"><button id="parseBtn" type="button">Parse SMS</button><button id="clearBtn" class="secondary" type="button">Clear</button></div>
+      <div id="parserStatus" class="status hidden" role="status"></div>
+      <div id="parserResult" class="result hidden"></div>
+    </section>
+    <div id="globalStatus" class="status hidden" role="status"></div>
+  </main>
+  <footer>Secure testing page · Zomba Welfare Management</footer>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    const SUPABASE_URL = "https://emmdhxlcqbvpvpjsmshz.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    const $ = (id) => document.getElementById(id);
+    function showStatus(el, message, type = "") {
+      el.textContent = message;
+      el.className = "status" + (type ? " " + type : "");
+      el.classList.remove("hidden");
+    }
+    function setBusy(button, busy, label) {
+      button.disabled = busy;
+      if (busy) { button.dataset.oldLabel = button.textContent; button.textContent = label; }
+      else if (button.dataset.oldLabel) { button.textContent = button.dataset.oldLabel; delete button.dataset.oldLabel; }
+    }
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+    async function refreshSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      $("authForms").classList.toggle("hidden", !!session);
+      $("sessionPanel").classList.toggle("hidden", !session);
+      $("parserPanel").classList.toggle("hidden", !session);
+      if (session) $("userEmail").textContent = session.user.email || "Signed-in account";
+      return session;
+    }
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = $("loginBtn"); setBusy(button, true, "Signing in...");
+      const { error } = await supabase.auth.signInWithPassword({
+        email: $("loginEmail").value.trim(),
+        password: $("loginPassword").value
+      });
+      setBusy(button, false);
+      if (error) return showStatus($("globalStatus"), error.message, "bad");
+      showStatus($("globalStatus"), "Signed in successfully.", "good");
+      await refreshSession();
+    });
+
+    $("signupForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = $("signupBtn"); setBusy(button, true, "Creating account...");
+      const { data, error } = await supabase.auth.signUp({
+        email: $("signupEmail").value.trim(),
+        password: $("signupPassword").value,
+        options: { data: {
+          full_name: $("fullName").value.trim(),
+          phone_number: $("phone").value.trim()
+        }}
+      });
+      setBusy(button, false);
+      if (error) return showStatus($("globalStatus"), error.message, "bad");
+      if (data.session) {
+        showStatus($("globalStatus"), "Account created and signed in.", "good");
+        await refreshSession();
+      } else {
+        showStatus($("globalStatus"), "Account created. Check your email for the verification link, then return here and sign in.", "good");
+      }
+    });
+
+    $("logoutBtn").addEventListener("click", async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) return showStatus($("globalStatus"), error.message, "bad");
+      $("parserResult").classList.add("hidden");
+      $("parserStatus").classList.add("hidden");
+      showStatus($("globalStatus"), "You have signed out.", "good");
+      await refreshSession();
+    });
+
+    $("parseBtn").addEventListener("click", async () => {
+      const message = $("smsMessage").value.trim();
+      if (!message) return showStatus($("parserStatus"), "Paste an SMS message first.", "bad");
+      const button = $("parseBtn"); setBusy(button, true, "Parsing...");
+      $("parserResult").classList.add("hidden");
+      const { data, error } = await supabase.functions.invoke("parse-payment-sms", {
+        body: { message }
+      });
+      setBusy(button, false);
+      if (error) {
+        let detail = error.message || "The parser request failed.";
+        try {
+          if (error.context && typeof error.context.json === "function") {
+            const body = await error.context.json();
+            if (body?.error) detail = body.error;
+          }
+        } catch {}
+        return showStatus($("parserStatus"), detail, "bad");
+      }
+      if (data?.error) return showStatus($("parserStatus"), data.error, "bad");
+
+      const statusText = data.status === "parsed_for_treasurer_review"
+        ? "SMS parsed. Recipient matched; treasurer verification is still required."
+        : "Manual review required. Do not treat this SMS as a verified payment.";
+      showStatus($("parserStatus"), statusText, data.manual_review_required ? "bad" : "good");
+
+      if (data.parsed) {
+        const p = data.parsed;
+        const rows = [
+          ["Provider", p.provider],
+          ["Transaction reference", p.transaction_id],
+          ["Date and time", p.transaction_date],
+          ["Amount (MWK)", p.amount],
+          ["Recipient in SMS", p.recipient],
+          ["Registered welfare account", p.registered_welfare_account],
+          ["Recipient matches", p.recipient_matches_welfare_account ? "Yes" : "No"]
+        ];
+        $("parserResult").innerHTML = "<dl>" + rows.map(([k,v]) =>
+          `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v ?? "Not extracted")}</dd>`
+        ).join("") + "</dl>" +
+        (data.warnings?.length ? `<p style="margin:12px 0 0;color:#a23b36">${data.warnings.map(escapeHtml).join("<br>")}</p>` : "");
+        $("parserResult").classList.remove("hidden");
+      }
+    });
+
+    $("clearBtn").addEventListener("click", () => {
+      $("smsMessage").value = "";
+      $("parserResult").classList.add("hidden");
+      $("parserStatus").classList.add("hidden");
+    });
+
+    supabase.auth.onAuthStateChange(() => { refreshSession(); });
+    await refreshSession();
+  </script>
+</body>
+</html>
