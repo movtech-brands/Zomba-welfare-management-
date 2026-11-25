@@ -1,202 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#2E7382">
-  <title>Zomba Welfare Management</title>
-  <style>
-    :root{--teal:#2E7382;--teal-dark:#205866;--bg:#f4f6f7;--ink:#263238;--muted:#68777d;--line:#e1e8ea;--white:#fff;--good:#176b45;--bad:#a23b36}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    .top{background:var(--teal);color:#fff;padding:24px 18px 34px}.top-inner{max-width:960px;margin:auto}.brand{font-weight:750;font-size:21px;letter-spacing:.1px}.tag{opacity:.9;margin-top:3px;font-size:13px}
-    main{max-width:960px;margin:-17px auto 40px;padding:0 16px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;box-shadow:0 5px 18px rgba(25,55,65,.045)}
-    h1{font-size:22px;margin:0 0 5px}h2{font-size:18px;margin:0 0 12px}p{margin:5px 0 14px;color:var(--muted)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    label{display:block;font-weight:650;font-size:13px;margin:12px 0 6px}input,textarea{width:100%;border:1px solid #cbd7da;border-radius:10px;padding:12px 13px;font:inherit;background:#fff;color:var(--ink);outline:none}
-    input:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(46,115,130,.12)}textarea{min-height:145px;resize:vertical}
-    button{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--teal);color:#fff;margin-top:14px}button:hover{background:var(--teal-dark)}button.secondary{background:#e8f0f1;color:var(--teal-dark)}button:disabled{opacity:.55;cursor:wait}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.status{padding:11px 13px;border-radius:10px;background:#eef3f4;color:#42545a;margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}.status.good{background:#eaf5ef;color:var(--good)}.status.bad{background:#fff0ef;color:var(--bad)}
-    .hidden{display:none!important}.small{font-size:12px;color:var(--muted)}.result{background:#f7f9f9;border:1px solid var(--line);border-radius:10px;padding:13px;margin-top:12px;overflow-wrap:anywhere}.result dl{display:grid;grid-template-columns: minmax(130px, .8fr) 1.2fr;gap:7px;margin:0}.result dt{color:var(--muted)}.result dd{margin:0;font-weight:650}.notice{border-left:4px solid var(--teal);padding:10px 12px;background:#f0f6f7;border-radius:5px;color:#40565d;font-size:13px}
-    footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 16px 25px}
-    @media(max-width:680px){.grid{grid-template-columns:1fr}.card{padding:18px}.top{padding:20px 16px 30px}main{padding:0 12px}.result dl{grid-template-columns:1fr;gap:2px}.result dd{margin-bottom:8px}}
-  </style>
-</head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2E7382">
+<title>Zomba Welfare Management</title>
+<style>
+:root{--t:#2E7382;--td:#205866;--bg:#f4f6f7;--ink:#263238;--muted:#68777d;--line:#e1e8ea;--soft:#eaf2f3}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Arial,sans-serif}.top{background:var(--t);color:white;padding:20px 18px 30px}.topin,main{max-width:1080px;margin:auto}.topin{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:20px;font-weight:800}.tag,.small{font-size:12px;opacity:.9}main{padding:0 14px;margin-top:-14px;margin-bottom:30px}.card{background:white;border:1px solid var(--line);border-radius:15px;padding:18px;margin-bottom:14px;box-shadow:0 5px 18px #19374108}h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:0 0 12px}p{color:var(--muted);margin:5px 0 12px}button{border:0;border-radius:10px;padding:11px 15px;background:var(--t);color:white;font:inherit;font-weight:700;cursor:pointer}button.secondary{background:var(--soft);color:var(--td)}button:disabled{opacity:.5}label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}input{width:100%;padding:12px;border:1px solid #cbd7da;border-radius:10px;font:inherit}.authgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.stat{background:white;border:1px solid var(--line);border-radius:13px;padding:14px}.k{font-size:12px;color:var(--muted)}.v{font-size:21px;font-weight:800;overflow-wrap:anywhere}.layout{display:grid;grid-template-columns:205px 1fr;gap:14px}.nav button{display:block;width:100%;text-align:left;background:transparent;color:var(--ink);margin:4px 0}.nav button.active,.nav button:hover{background:var(--soft);color:var(--td)}.section{display:none}.section.active{display:block}.hidden{display:none!important}.status,.notice,.empty{padding:12px;border-radius:10px;margin-top:12px;background:#eef3f4;color:#42545a;overflow-wrap:anywhere}.status.good{background:#eaf5ef;color:#176b45}.status.bad{background:#fff0ef;color:#a23b36}.notice{border-left:4px solid var(--t);background:#f0f6f7}.empty{text-align:center;border:1px dashed #cbd7da;background:#fafcfc;color:var(--muted)}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:530px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);font-size:13px}th{color:var(--muted);background:#fafcfc}.pill{display:inline-block;border-radius:20px;padding:3px 8px;background:#eef2f3;font-size:11px;font-weight:700}.paid,.verified{background:#e7f4ec;color:#176b45}.pending{background:#fff4df;color:#865b13}.rejected,.unpaid{background:#fff0ef;color:#a23b36}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}footer{text-align:center;color:var(--muted);font-size:12px;padding:15px}
+@media(max-width:720px){.authgrid,.layout{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nav{display:flex;overflow-x:auto;gap:4px;padding:8px}.nav button{white-space:nowrap;width:auto;margin:0}.topin{align-items:flex-start;flex-direction:column}.v{font-size:18px}}
+</style></head>
 <body>
-  <header class="top"><div class="top-inner"><div class="brand">Zomba Welfare Management</div><div class="tag">Together, we care.</div></div></header>
-  <main>
-    <section class="card">
-      <h1>Welcome</h1>
-      <p>Sign in to test the secure payment SMS parser. This starter page is for authentication and parser testing only.</p>
-      <div class="notice">A parsed SMS is not proof that money reached the welfare account. All payments still require treasurer verification.</div>
-    </section>
-
-    <section class="grid" id="authForms">
-      <div class="card">
-        <h2>Sign in</h2>
-        <form id="loginForm">
-          <label for="loginEmail">Email address</label><input id="loginEmail" type="email" autocomplete="email" required>
-          <label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" required>
-          <button id="loginBtn" type="submit">Sign in</button>
-        </form>
-      </div>
-      <div class="card">
-        <h2>Create an account</h2>
-        <p class="small">New accounts receive the member role. Email verification may be required before sign-in.</p>
-        <form id="signupForm">
-          <label for="fullName">Full name</label><input id="fullName" autocomplete="name" required>
-          <label for="phone">Phone number</label><input id="phone" type="tel" autocomplete="tel">
-          <label for="signupEmail">Personal email</label><input id="signupEmail" type="email" autocomplete="email" required>
-          <label for="signupPassword">Password</label><input id="signupPassword" type="password" minlength="8" autocomplete="new-password" required>
-          <button id="signupBtn" type="submit">Create account</button>
-        </form>
-      </div>
-    </section>
-
-    <section class="card hidden" id="sessionPanel">
-      <div class="row" style="justify-content:space-between">
-        <div><h2>Signed in</h2><div id="userEmail" class="small"></div></div>
-        <button id="logoutBtn" class="secondary" type="button">Sign out</button>
-      </div>
-      <div class="notice" style="margin-top:14px">Paste the original transaction SMS below. The extracted fields are displayed for review only; this page does not submit or verify a payment.</div>
-    </section>
-
-    <section class="card hidden" id="parserPanel">
-      <h2>Test payment SMS parser</h2>
-      <label for="smsMessage">Original transaction SMS</label>
-      <textarea id="smsMessage" maxlength="5000" placeholder="Paste the complete Airtel Money, TNM Mpamba or National Bank SMS here..."></textarea>
-      <div class="row"><button id="parseBtn" type="button">Parse SMS</button><button id="clearBtn" class="secondary" type="button">Clear</button></div>
-      <div id="parserStatus" class="status hidden" role="status"></div>
-      <div id="parserResult" class="result hidden"></div>
-    </section>
-    <div id="globalStatus" class="status hidden" role="status"></div>
-  </main>
-  <footer>Secure testing page · Zomba Welfare Management</footer>
-
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-    const SUPABASE_URL = "https://emmdhxlcqbvpvpjsmshz.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-
-    const $ = (id) => document.getElementById(id);
-    function showStatus(el, message, type = "") {
-      el.textContent = message;
-      el.className = "status" + (type ? " " + type : "");
-      el.classList.remove("hidden");
-    }
-    function setBusy(button, busy, label) {
-      button.disabled = busy;
-      if (busy) { button.dataset.oldLabel = button.textContent; button.textContent = label; }
-      else if (button.dataset.oldLabel) { button.textContent = button.dataset.oldLabel; delete button.dataset.oldLabel; }
-    }
-    function escapeHtml(value) {
-      return String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-    }
-    async function refreshSession() {
-      const { data: { session } } = await supabase.auth.getSession();
-      $("authForms").classList.toggle("hidden", !!session);
-      $("sessionPanel").classList.toggle("hidden", !session);
-      $("parserPanel").classList.toggle("hidden", !session);
-      if (session) $("userEmail").textContent = session.user.email || "Signed-in account";
-      return session;
-    }
-
-    $("loginForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const button = $("loginBtn"); setBusy(button, true, "Signing in...");
-      const { error } = await supabase.auth.signInWithPassword({
-        email: $("loginEmail").value.trim(),
-        password: $("loginPassword").value
-      });
-      setBusy(button, false);
-      if (error) return showStatus($("globalStatus"), error.message, "bad");
-      showStatus($("globalStatus"), "Signed in successfully.", "good");
-      await refreshSession();
-    });
-
-    $("signupForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const button = $("signupBtn"); setBusy(button, true, "Creating account...");
-      const { data, error } = await supabase.auth.signUp({
-        email: $("signupEmail").value.trim(),
-        password: $("signupPassword").value,
-        options: { data: {
-          full_name: $("fullName").value.trim(),
-          phone_number: $("phone").value.trim()
-        }}
-      });
-      setBusy(button, false);
-      if (error) return showStatus($("globalStatus"), error.message, "bad");
-      if (data.session) {
-        showStatus($("globalStatus"), "Account created and signed in.", "good");
-        await refreshSession();
-      } else {
-        showStatus($("globalStatus"), "Account created. Check your email for the verification link, then return here and sign in.", "good");
-      }
-    });
-
-    $("logoutBtn").addEventListener("click", async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) return showStatus($("globalStatus"), error.message, "bad");
-      $("parserResult").classList.add("hidden");
-      $("parserStatus").classList.add("hidden");
-      showStatus($("globalStatus"), "You have signed out.", "good");
-      await refreshSession();
-    });
-
-    $("parseBtn").addEventListener("click", async () => {
-      const message = $("smsMessage").value.trim();
-      if (!message) return showStatus($("parserStatus"), "Paste an SMS message first.", "bad");
-      const button = $("parseBtn"); setBusy(button, true, "Parsing...");
-      $("parserResult").classList.add("hidden");
-      const { data, error } = await supabase.functions.invoke("parse-payment-sms", {
-        body: { message }
-      });
-      setBusy(button, false);
-      if (error) {
-        let detail = error.message || "The parser request failed.";
-        try {
-          if (error.context && typeof error.context.json === "function") {
-            const body = await error.context.json();
-            if (body?.error) detail = body.error;
-          }
-        } catch {}
-        return showStatus($("parserStatus"), detail, "bad");
-      }
-      if (data?.error) return showStatus($("parserStatus"), data.error, "bad");
-
-      const statusText = data.status === "parsed_for_treasurer_review"
-        ? "SMS parsed. Recipient matched; treasurer verification is still required."
-        : "Manual review required. Do not treat this SMS as a verified payment.";
-      showStatus($("parserStatus"), statusText, data.manual_review_required ? "bad" : "good");
-
-      if (data.parsed) {
-        const p = data.parsed;
-        const rows = [
-          ["Provider", p.provider],
-          ["Transaction reference", p.transaction_id],
-          ["Date and time", p.transaction_date],
-          ["Amount (MWK)", p.amount],
-          ["Recipient in SMS", p.recipient],
-          ["Registered welfare account", p.registered_welfare_account],
-          ["Recipient matches", p.recipient_matches_welfare_account ? "Yes" : "No"]
-        ];
-        $("parserResult").innerHTML = "<dl>" + rows.map(([k,v]) =>
-          `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v ?? "Not extracted")}</dd>`
-        ).join("") + "</dl>" +
-        (data.warnings?.length ? `<p style="margin:12px 0 0;color:#a23b36">${data.warnings.map(escapeHtml).join("<br>")}</p>` : "");
-        $("parserResult").classList.remove("hidden");
-      }
-    });
-
-    $("clearBtn").addEventListener("click", () => {
-      $("smsMessage").value = "";
-      $("parserResult").classList.add("hidden");
-      $("parserStatus").classList.add("hidden");
-    });
-
-    supabase.auth.onAuthStateChange(() => { refreshSession(); });
-    await refreshSession();
-  </script>
-</body>
-</html>
+<header class="top"><div class="topin"><div><div class="brand">Zomba Welfare Management</div><div class="tag">Together, we care.</div></div><button id="logout" class="secondary hidden">Sign out</button></div></header>
+<main>
+<section id="auth" class="card"><h1>Welcome</h1><p>Sign in to access your welfare account.</p><div class="authgrid">
+<div><h2>Sign in</h2><form id="login"><label>Email address</label><input id="le" type="email" required autocomplete="email"><label>Password</label><input id="lp" type="password" required autocomplete="current-password"><button id="lb">Sign in</button></form></div>
+<div><h2>Create an account</h2><p class="small">New accounts are automatically assigned the member role. Email verification may be required.</p><form id="signup"><label>Full name</label><input id="name" required><label>Phone number</label><input id="phone" type="tel"><label>Personal email</label><input id="se" type="email" required><label>Password</label><input id="sp" type="password" minlength="8" required><button id="sb">Create account</button></form></div></div><div id="authmsg" class="status hidden"></div></section>
+<section id="app" class="hidden">
+<div class="card row"><div><h1 id="welcome">My dashboard</h1><p id="email" class="small"></p></div><span id="role" class="pill">member</span></div>
+<div class="grid" style="margin-bottom:14px"><div class="stat"><div class="k">Verified contributions</div><div class="v" id="paidTotal">MWK 0</div><div class="k">Allocated to obligations</div></div><div class="stat"><div class="k">Outstanding balance</div><div class="v" id="dueTotal">MWK 0</div><div class="k">All generated months</div></div><div class="stat"><div class="k">Fully paid months</div><div class="v" id="paidMonths">0</div><div class="k">Completed obligations</div></div><div class="stat"><div class="k">Wallet credit</div><div class="v" id="wallet">MWK 0</div><div class="k">Unallocated credit</div></div></div>
+<div class="layout"><aside class="card nav"><button class="active" data-tab="dashboard">Dashboard</button><button data-tab="contributions">My Contributions</button><button data-tab="history">Payment History</button><button data-tab="activities">Welfare Activities</button></aside>
+<div><section id="dashboard" class="section active"><div class="card"><div class="row"><h2>Contribution summary</h2><button id="refresh" class="secondary">Refresh data</button></div><div id="summary" class="small">Loading records...</div></div><div class="card"><h2>Recent payments</h2><div id="recent" class="empty">Loading...</div></div><div class="card"><h2>Upcoming welfare activities</h2><div class="empty">Activities will appear here when that module is connected.</div></div></section>
+<section id="contributions" class="section"><div class="card"><h2>My monthly contributions</h2><p class="small">Standard contribution: MWK 7,000. Applicable missed-month penalty: MWK 1,000. Your actual obligation is displayed below.</p><div id="obligations" class="empty">Loading...</div></div></section>
+<section id="history" class="section"><div class="card"><h2>Payment history</h2><p class="small">A submitted SMS is not a verified payment. Status changes only after authorised treasurer or administrator review.</p><div id="payments" class="empty">Loading...</div></div></section>
+<section id="activities" class="section"><div class="card"><h2>Welfare activities</h2><div class="empty">No activities are available yet. This section will be connected in a later step.</div></div></section></div></div></section>
+<div id="global" class="status hidden"></div></main><footer>Zomba Welfare Management · Together, we care.</footer>
+<script type="module">
+import{createClient}from"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const db=createClient("https://emmdhxlcqbvpvpjsmshz.supabase.co","sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm");
+const $=id=>document.getElementById(id),money=n=>"MWK "+Number(n||0).toLocaleString("en-US",{maximumFractionDigits:2});
+function msg(el,t,c=""){el.textContent=t;el.className="status"+(c?" "+c);el.classList.remove("hidden")}
+function table(el,heads,rows,empty){$(el).innerHTML=rows.length?`<div class="tablewrap"><table><thead><tr>${heads.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`:`<div class="empty">${empty}</div>`}
+function esc(x){return String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function badge(s){s=String(s||"unknown").toLowerCase();return `<span class="pill ${esc(s)}">${esc(s)}</span>`}
+function month(s){if(!s)return"—";let d=new Date(s+"T00:00:00");return d.toLocaleDateString("en-GB",{month:"long",year:"numeric"})}
+async function load(){
+ const {data:{user}}=await db.auth.getUser();if(!user)return;
+ const results=await Promise.all([
+ db.from("profiles").select("full_name").eq("id",user.id).maybeSingle(),
+ db.from("user_roles").select("role").eq("user_id",user.id).maybeSingle(),
+ db.from("member_contribution_summaries").select("*").eq("member_id",user.id).maybeSingle(),
+ db.from("member_wallet_balances").select("*").eq("member_id",user.id).maybeSingle(),
+ db.from("contribution_obligations").select("contribution_month,base_amount_due,penalty_amount_due,amount_due,amount_paid,status").eq("member_id",user.id).order("contribution_month",{ascending:false}),
+ db.from("payment_submissions").select("transaction_id,transaction_date,amount,provider,status").eq("member_id",user.id).order("created_at",{ascending:false}).limit(30)
+ ]);
+ const err=results.find(r=>r.error);if(err){$("summary").textContent="Could not load all records: "+err.error.message;return}
+ const [profile,role,s,w,obs,pays]=results.map(r=>r.data);
+ if(profile?.full_name)$("welcome").textContent="Welcome, "+profile.full_name;
+ $("email").textContent=user.email||"";$("role").textContent=role?.role||"member";
+ $("paidTotal").textContent=money(s?.total_amount_paid);$("dueTotal").textContent=money(s?.outstanding_balance);$("paidMonths").textContent=s?.fully_paid_months||0;$("wallet").textContent=money(w?.wallet_balance);
+ $("summary").textContent=obs.length?`${obs.length} contribution month(s) found. Your latest records are listed below.`:"No contribution obligations have been generated for your account yet. This is normal until monthly obligations are created.";
+ table("obligations",["Month","Base","Penalty","Total due","Paid","Status"],obs.map(o=>`<tr><td>${month(o.contribution_month)}</td><td>${money(o.base_amount_due)}</td><td>${money(o.penalty_amount_due)}</td><td>${money(o.amount_due)}</td><td>${money(o.amount_paid)}</td><td>${badge(o.status)}</td></tr>`),"No monthly obligations have been generated yet.");
+ const rows=pays.map(p=>`<tr><td>${esc(p.provider||"Not identified")}</td><td>${esc(p.transaction_id)}</td><td>${new Date(p.transaction_date).toLocaleDateString("en-GB")}</td><td>${money(p.amount)}</td><td>${badge(p.status)}</td></tr>`);
+ table("payments",["Provider","Reference","Date","Amount","Status"],rows,"You have not submitted any payment records yet.");
+ table("recent",["Provider","Reference","Amount","Status"],pays.slice(0,5).map(p=>`<tr><td>${esc(p.provider||"Not identified")}</td><td>${esc(p.transaction_id)}</td><td>${money(p.amount)}</td><td>${badge(p.status)}</td></tr>`),"No recent payment submissions.");
+}
+async function refresh(){const{data:{session}}=await db.auth.getSession();$("auth").classList.toggle("hidden",!!session);$("app").classList.toggle("hidden",!session);$("logout").classList.toggle("hidden",!session);if(session)await load()}
+$("login").addEventListener("submit",async e=>{e.preventDefault();const b=$("lb");b.disabled=true;const{error}=await db.auth.signInWithPassword({email:$("le").value.trim(),password:$("lp").value});b.disabled=false;if(error)msg($("authmsg"),error.message,"bad");else{msg($("global"),"Signed in successfully.","good");await refresh()}});
+$("signup").addEventListener("submit",async e=>{e.preventDefault();const b=$("sb");b.disabled=true;const{data,error}=await db.auth.signUp({email:$("se").value.trim(),password:$("sp").value,options:{data:{full_name:$("name").value.trim(),phone_number:$("phone").value.trim()}}});b.disabled=false;if(error)msg($("authmsg"),error.message,"bad");else if(data.session)await refresh();else msg($("authmsg"),"Account created. Check your email for the verification link, then sign in.","good")});
+$("logout").addEventListener("click",async()=>{await db.auth.signOut();await refresh()});$("refresh").addEventListener("click",load);
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",x.id===b.dataset.tab))}));
+db.auth.onAuthStateChange(()=>refresh());await refresh();
+</script></body></html>
