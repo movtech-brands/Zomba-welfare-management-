@@ -468,6 +468,11 @@ async function submitPayment(){
 
   const transactionId=parsed.transaction_id||parsed.reference||parsed.transaction_reference;
   const amount=Number(parsed.amount||parsed.transaction_amount);
+  message.style.color='#225967';
+message.textContent='Parser response: '+JSON.stringify(parsed);
+button.disabled=false;
+button.textContent='Submit for Verification';
+return;
 
   if(!transactionId||!Number.isFinite(amount)||amount<=0){
    throw new Error('The parser could not identify a valid transaction reference and amount. Please check the SMS.');
