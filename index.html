@@ -2,467 +2,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2E7382">
-<title>Zomba Welfare Management</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zomba Welfare Management</title>
 
-<style>
-:root {
-  --primary: #2E7382;
-  --dark: #205866;
-  --background: #F4F6F7;
-  --white: #FFFFFF;
-  --text: #333333;
-  --muted: #77858A;
-  --border: #E1E8EA;
-}
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-* {
-  box-sizing: border-box;
-}
+  <style>
+    :root {
+      --primary: #2E7382;
+      --white: #FFFFFF;
+      --background: #F4F4F4;
+      --text: #333333;
+    }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Arial, sans-serif;
-  background: var(--background);
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
-button, input {
-  font: inherit;
-}
+    body {
+      min-height: 100vh;
+      background: var(--background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text);
+    }
 
-.login-container {
-  width: 100%;
-  max-width: 410px;
-}
+    .container {
+      width: 100%;
+      max-width: 410px;
+      background: var(--white);
+      padding: 35px 25px;
+      border-radius: 16px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.07);
+    }
 
-.brand {
-  text-align: center;
-  margin-bottom: 28px;
-}
+    .brand {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-.brand h1 {
-  color: var(--primary);
-  font-size: 27px;
-  margin: 0;
-  font-weight: 800;
-  letter-spacing: -0.7px;
-}
+    .brand h1 {
+      color: var(--primary);
+      font-size: 25px;
+      margin-bottom: 7px;
+    }
 
-.brand p {
-  color: var(--muted);
-  font-size: 13px;
-  margin: 7px 0 0;
-}
+    .brand p {
+      color: #777;
+      font-size: 13px;
+    }
 
-.login-card {
-  background: var(--white);
-  padding: 28px 24px;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.05);
-}
+    h2 {
+      font-size: 20px;
+      margin-bottom: 22px;
+      text-align: center;
+    }
 
-.login-card h2 {
-  font-size: 20px;
-  margin: 0 0 20px;
-  text-align: center;
-}
+    .field {
+      margin-bottom: 16px;
+    }
 
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  margin: 15px 0 6px;
-}
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
 
-input {
-  width: 100%;
-  padding: 13px;
-  border: 1px solid #CBD7DA;
-  border-radius: 9px;
-  outline: none;
-  background: white;
-}
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+    }
 
-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(46,115,130,0.1);
-}
+    input:focus {
+      border-color: var(--primary);
+    }
 
-.primary-btn {
-  width: 100%;
-  padding: 13px;
-  border: none;
-  border-radius: 9px;
-  background: var(--primary);
-  color: white;
-  font-weight: 700;
-  margin-top: 22px;
-  cursor: pointer;
-}
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
 
-.primary-btn:hover {
-  background: var(--dark);
-}
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-.primary-btn:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
+    .switch {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+    }
 
-.signup-link {
-  text-align: center;
-  font-size: 13px;
-  color: var(--muted);
-  margin: 20px 0 0;
-}
+    .switch a {
+      color: var(--primary);
+      font-weight: bold;
+      text-decoration: none;
+    }
 
-.signup-link a {
-  color: var(--primary);
-  font-weight: 700;
-  text-decoration: none;
-}
+    .message {
+      margin-top: 15px;
+      padding: 11px;
+      border-radius: 7px;
+      font-size: 13px;
+      display: none;
+      line-height: 1.5;
+    }
 
-.message {
-  margin-top: 15px;
-  padding: 11px;
-  border-radius: 8px;
-  font-size: 13px;
-  display: none;
-  overflow-wrap: anywhere;
-}
+    .error {
+      background: #fdeaea;
+      color: #a32626;
+    }
 
-.message.error {
-  display: block;
-  background: #FFF0EF;
-  color: #A23B36;
-}
+    .success {
+      background: #e7f5eb;
+      color: #216b38;
+    }
 
-.message.success {
-  display: block;
-  background: #EAF5EF;
-  color: #176B45;
-}
+    .hidden {
+      display: none;
+    }
 
-/* Registration form */
-.signup-form {
-  display: none;
-}
-
-.back-link {
-  display: block;
-  text-align: center;
-  margin-top: 18px;
-  font-size: 13px;
-  color: var(--primary);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-footer {
-  text-align: center;
-  color: var(--muted);
-  font-size: 11px;
-  margin-top: 25px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-@media(max-width:420px) {
-  .brand h1 {
-    font-size: 23px;
-  }
-
-  .login-card {
-    padding: 24px 19px;
-  }
-}
-</style>
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #999;
+      font-size: 11px;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="login-container">
+  <div class="container">
 
-  <div class="brand">
-    <h1>Zomba Welfare Management</h1>
-    <p>Together, we care.</p>
-  </div>
-
-  <div class="login-card">
+    <div class="brand">
+      <h1>Zomba Welfare Management</h1>
+      <p>Together, we care.</p>
+    </div>
 
     <!-- LOGIN FORM -->
     <div id="loginSection">
-      <h2>Log in to your account</h2>
+      <h2>Member Login</h2>
 
       <form id="loginForm">
 
-        <label for="email">Email address</label>
-        <input
-          type="email"
-          id="email"
-          placeholder="Enter your email"
-          autocomplete="email"
-          required
-        >
+        <div class="field">
+          <label>Email Address</label>
+          <input
+            type="email"
+            id="loginEmail"
+            placeholder="Enter your email"
+            required
+          >
+        </div>
 
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Enter your password"
-          autocomplete="current-password"
-          required
-        >
+        <div class="field">
+          <label>Password</label>
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Enter your password"
+            required
+          >
+        </div>
 
-        <button type="submit" class="primary-btn" id="loginButton">
-          Log in
+        <button type="submit" id="loginButton">
+          Login
         </button>
 
       </form>
 
-      <div id="loginMessage" class="message"></div>
-
-      <p class="signup-link">
+      <div class="switch">
         Don't have an account?
-        <a href="#" id="showSignup">Sign up</a>
-      </p>
+        <a href="#" id="showSignup">Create account</a>
+      </div>
     </div>
 
-    <!-- SIGN UP FORM -->
-    <div id="signupSection" class="signup-form">
 
-      <h2>Create your account</h2>
+    <!-- SIGNUP FORM -->
+    <div id="signupSection" class="hidden">
+      <h2>Create Account</h2>
 
       <form id="signupForm">
 
-        <label for="fullName">Full name</label>
-        <input id="fullName" required placeholder="Your full name">
+        <div class="field">
+          <label>Full Name</label>
+          <input
+            type="text"
+            id="fullName"
+            placeholder="Enter your full name"
+            required
+          >
+        </div>
 
-        <label for="phone">Phone number</label>
-        <input id="phone" type="tel" placeholder="Your phone number">
+        <div class="field">
+          <label>Phone Number</label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            placeholder="Enter your phone number"
+            required
+          >
+        </div>
 
-        <label for="signupEmail">Personal email</label>
-        <input id="signupEmail" type="email" required placeholder="Your email">
+        <div class="field">
+          <label>Personal Email Address</label>
+          <input
+            type="email"
+            id="signupEmail"
+            placeholder="Enter your email"
+            required
+          >
+        </div>
 
-        <label for="signupPassword">Password</label>
-        <input id="signupPassword" type="password" minlength="8" required placeholder="At least 8 characters">
+        <div class="field">
+          <label>Password</label>
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="Create a password"
+            minlength="8"
+            required
+          >
+        </div>
 
-        <button type="submit" class="primary-btn" id="signupButton">
-          Create account
+        <button type="submit" id="signupButton">
+          Create Account
         </button>
 
       </form>
 
-      <div id="signupMessage" class="message"></div>
+      <div class="switch">
+        Already have an account?
+        <a href="#" id="showLogin">Login</a>
+      </div>
+    </div>
 
-      <a class="back-link" id="showLogin" href="#">
-        Back to log in
-      </a>
+    <div id="message" class="message"></div>
 
+    <div class="footer">
+      Zomba Welfare Management System
     </div>
 
   </div>
 
-  <footer>
-    Zomba Welfare Management
-  </footer>
 
-</div>
+<script>
+  // SUPABASE CONFIGURATION
+  const SUPABASE_URL = "https://emmdhxlcqbvpvpjsmshz.supabase.co";
 
-<script type="module">
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm";
 
-import { createClient } from
-"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
-const SUPABASE_URL =
-"https://emmdhxlcqbvpvpjsmshz.supabase.co";
 
-const SUPABASE_KEY =
-"sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm";
+  // ELEMENTS
+  const loginSection = document.getElementById("loginSection");
+  const signupSection = document.getElementById("signupSection");
+  const messageBox = document.getElementById("message");
 
-const supabase = createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
 
-const $ = id => document.getElementById(id);
-
-function showMessage(element, text, type) {
-  element.textContent = text;
-  element.className = "message " + type;
-}
-
-function showLoginForm() {
-  $("loginSection").style.display = "block";
-  $("signupSection").style.display = "none";
-  $("loginMessage").className = "message";
-  $("signupMessage").className = "message";
-}
-
-function showSignupForm() {
-  $("loginSection").style.display = "none";
-  $("signupSection").style.display = "block";
-  $("loginMessage").className = "message";
-  $("signupMessage").className = "message";
-}
-
-$("showSignup").addEventListener("click", e => {
-  e.preventDefault();
-  showSignupForm();
-});
-
-$("showLogin").addEventListener("click", e => {
-  e.preventDefault();
-  showLoginForm();
-});
-
-/* ROLE-BASED REDIRECTION */
-
-async function redirectByRole() {
-
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    showLoginForm();
-    return;
+  // DISPLAY MESSAGE
+  function showMessage(message, type = "error") {
+    messageBox.textContent = message;
+    messageBox.className = "message " + type;
+    messageBox.style.display = "block";
   }
 
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (error || !data) {
-    await supabase.auth.signOut();
-
-    showMessage(
-      $("loginMessage"),
-      "Unable to verify your account role. Please contact the administrator.",
-      "error"
-    );
-
-    return;
+  function clearMessage() {
+    messageBox.style.display = "none";
+    messageBox.textContent = "";
   }
 
-  const role = data.role;
 
-  if (role === "administrator") {
-    window.location.replace("admin.html");
-  }
-
-  else if (role === "member") {
-    window.location.replace("member.html");
-  }
-
-  else if (role === "treasurer") {
-    window.location.replace("treasurer.html");
-  }
-
-  else if (role === "chairperson") {
-    window.location.replace("chairperson.html");
-  }
-
-  else {
-    await supabase.auth.signOut();
-
-    showMessage(
-      $("loginMessage"),
-      "Your account role is not recognised. Please contact the administrator.",
-      "error"
-    );
-  }
-}
-
-/* LOGIN */
-
-$("loginForm").addEventListener("submit", async e => {
-
-  e.preventDefault();
-
-  const button = $("loginButton");
-  button.disabled = true;
-  button.textContent = "Signing in...";
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email: $("email").value.trim(),
-    password: $("password").value
+  // SWITCH BETWEEN LOGIN AND SIGNUP
+  document.getElementById("showSignup").addEventListener("click", function(e) {
+    e.preventDefault();
+    clearMessage();
+    loginSection.classList.add("hidden");
+    signupSection.classList.remove("hidden");
   });
 
-  button.disabled = false;
-  button.textContent = "Log in";
+  document.getElementById("showLogin").addEventListener("click", function(e) {
+    e.preventDefault();
+    clearMessage();
+    signupSection.classList.add("hidden");
+    loginSection.classList.remove("hidden");
+  });
 
-  if (error) {
-    showMessage($("loginMessage"), error.message, "error");
-    return;
-  }
 
-  await redirectByRole();
+  // ROLE-BASED REDIRECTION
+  async function redirectUser(user) {
 
-});
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .maybeSingle();
 
-/* REGISTRATION */
-
-$("signupForm").addEventListener("submit", async e => {
-
-  e.preventDefault();
-
-  const button = $("signupButton");
-  button.disabled = true;
-  button.textContent = "Creating account...";
-
-  const { data, error } = await supabase.auth.signUp({
-
-    email: $("signupEmail").value.trim(),
-
-    password: $("signupPassword").value,
-
-    options: {
-      data: {
-        full_name: $("fullName").value.trim(),
-        phone_number: $("phone").value.trim()
-      }
+    if (error) {
+      console.error("Role lookup error:", error);
+      throw new Error("Unable to check your account role. Please try again.");
     }
 
+    if (!data) {
+      await supabase.auth.signOut();
+      throw new Error("No system role is assigned to your account. Contact the administrator.");
+    }
+
+    if (data.role === "administrator") {
+      window.location.replace("admin.html");
+      return;
+    }
+
+    if (data.role === "member") {
+      window.location.replace("member.html");
+      return;
+    }
+
+    await supabase.auth.signOut();
+
+    throw new Error("Your account has an invalid role. Contact the administrator.");
+  }
+
+
+  // LOGIN
+  document.getElementById("loginForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    clearMessage();
+
+    const button = document.getElementById("loginButton");
+    button.disabled = true;
+    button.textContent = "Signing in...";
+
+    try {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      await redirectUser(data.user);
+
+    } catch (error) {
+      showMessage(error.message || "Login failed. Please try again.");
+      button.disabled = false;
+      button.textContent = "Login";
+    }
   });
 
-  button.disabled = false;
-  button.textContent = "Create account";
 
-  if (error) {
-    showMessage($("signupMessage"), error.message, "error");
-    return;
+  // SIGN UP
+  document.getElementById("signupForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    clearMessage();
+
+    const button = document.getElementById("signupButton");
+    button.disabled = true;
+    button.textContent = "Creating account...";
+
+    try {
+      const fullName = document.getElementById("fullName").value.trim();
+      const phoneNumber = document.getElementById("phoneNumber").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone_number: phoneNumber
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.session && data.user) {
+        showMessage(
+          "Your account has been created. You can now access the system.",
+          "success"
+        );
+
+        await redirectUser(data.user);
+      } else {
+        showMessage(
+          "Your account has been created. Please check your email and click the verification link before logging in.",
+          "success"
+        );
+
+        document.getElementById("signupForm").reset();
+      }
+
+    } catch (error) {
+      showMessage(error.message || "Registration failed. Please try again.");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Create Account";
+    }
+  });
+
+
+  // CHECK EXISTING SESSION
+  async function checkExistingSession() {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error) throw error;
+
+      if (data.session && data.session.user) {
+        await redirectUser(data.session.user);
+      }
+
+    } catch (error) {
+      console.error("Session check:", error);
+    }
   }
 
-  if (data.session) {
-    await redirectByRole();
-  } else {
-    showMessage(
-      $("signupMessage"),
-      "Account created. Please check your email for the verification link, then log in.",
-      "success"
-    );
-  }
-
-});
-
-/* CHECK EXISTING SESSION */
-
-await redirectByRole();
+  checkExistingSession();
 
 </script>
 
