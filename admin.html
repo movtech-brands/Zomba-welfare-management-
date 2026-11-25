@@ -1,0 +1,1032 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administrator | Zomba Welfare Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --primary:#2E7382;
+  --primary-dark:#205866;
+  --light:#F4F4F4;
+  --white:#fff;
+  --text:#333;
+  --muted:#849199;
+  --border:#e9edef;
+  --green:#23966b;
+  --orange:#d88a32;
+  --red:#d95353;
+  --sidebar:#183b45;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Arial,sans-serif;
+  background:var(--light);
+  color:var(--text);
+  min-height:100vh;
+}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* PREMIUM LOADING SCREEN */
+#loadingScreen{
+  position:fixed;inset:0;background:#fff;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:18px;
+}
+.loader-logo{
+  width:58px;height:58px;border-radius:18px;
+  background:var(--primary);color:white;
+  display:flex;align-items:center;justify-content:center;
+  font-size:25px;font-weight:bold;
+  animation:logoPulse 1.5s infinite ease-in-out;
+}
+.loader-ring{
+  width:34px;height:34px;border:3px solid #e5eeee;
+  border-top-color:var(--primary);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+.loader-text{font-size:13px;color:#718087}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes logoPulse{
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 #2e738222}
+  50%{transform:scale(1.07);box-shadow:0 0 0 12px #2e738200}
+}
+
+/* APP LAYOUT */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:250px;background:var(--sidebar);color:white;
+  position:fixed;inset:0 auto 0 0;z-index:100;
+  display:flex;flex-direction:column;
+  transition:transform .3s ease;
+}
+.brand{
+  padding:25px 20px 22px;
+  border-bottom:1px solid #ffffff18;
+}
+.brand-name{font-size:18px;font-weight:700;line-height:1.4}
+.brand-sub{font-size:11px;color:#b9cbd0;margin-top:5px}
+.admin-label{
+  margin:22px 20px 10px;font-size:10px;
+  letter-spacing:1.5px;color:#9bb3ba;text-transform:uppercase;
+}
+.nav{padding:0 12px;flex:1;overflow-y:auto}
+.nav button{
+  width:100%;border:0;background:transparent;color:#d5e1e4;
+  padding:13px 14px;margin:3px 0;border-radius:9px;
+  text-align:left;font-size:13px;display:flex;align-items:center;gap:12px;
+  transition:background .2s,color .2s;
+}
+.nav button:hover,.nav button.active{
+  background:#ffffff18;color:#fff;
+}
+.nav-icon{width:20px;text-align:center;font-size:17px}
+.sidebar-bottom{padding:15px;border-top:1px solid #ffffff18}
+.profile-mini{display:flex;align-items:center;gap:10px;padding:8px}
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:#d4ecdd;color:var(--sidebar);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:bold;font-size:14px;
+}
+.profile-mini strong{font-size:12px;display:block}
+.profile-mini small{font-size:10px;color:#b9cbd0}
+
+/* MAIN */
+.main{margin-left:250px;width:calc(100% - 250px);min-height:100vh}
+.topbar{
+  height:70px;background:white;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 30px;position:sticky;top:0;z-index:50;
+}
+.top-left{display:flex;align-items:center;gap:13px}
+.menu-toggle{
+  display:none;border:0;background:#f1f5f5;border-radius:8px;
+  width:38px;height:38px;font-size:20px;color:var(--primary);
+}
+.page-heading{font-size:16px;font-weight:700}
+.top-right{display:flex;align-items:center;gap:15px}
+.date-label{font-size:12px;color:var(--muted)}
+.logout-btn{
+  border:1px solid var(--border);background:white;color:#555;
+  border-radius:8px;padding:9px 13px;font-size:12px;
+}
+.logout-btn:hover{border-color:var(--primary);color:var(--primary)}
+.content{padding:28px 30px;max-width:1500px;margin:auto}
+.welcome{margin-bottom:25px}
+.welcome h2{font-size:23px;margin-bottom:7px}
+.welcome p{font-size:13px;color:var(--muted)}
+
+/* DASHBOARD CARDS */
+.stats{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:17px;margin-bottom:25px;
+}
+.stat-card{
+  background:white;border:1px solid var(--border);
+  border-radius:13px;padding:20px;
+  transition:transform .2s,box-shadow .2s;
+}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px #183b450d}
+.stat-top{display:flex;justify-content:space-between;align-items:center}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-icon{
+  width:37px;height:37px;border-radius:10px;
+  background:#eaf3f4;display:flex;align-items:center;
+  justify-content:center;font-size:18px;
+}
+.stat-value{font-size:27px;font-weight:700;margin-top:15px}
+.stat-note{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* PANELS */
+.panel{
+  background:white;border:1px solid var(--border);
+  border-radius:13px;margin-bottom:22px;overflow:hidden;
+}
+.panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:19px 21px;border-bottom:1px solid var(--border);
+}
+.panel-header h3{font-size:14px}
+.panel-header p{font-size:11px;color:var(--muted);margin-top:5px}
+.panel-body{padding:20px}
+.section{display:none;animation:fadeIn .3s ease}
+.section.active{display:block}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(7px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th{
+  text-align:left;background:#f8fafb;color:#78868c;
+  font-size:10px;text-transform:uppercase;letter-spacing:.5px;
+  padding:13px 15px;
+}
+td{padding:15px;border-bottom:1px solid #f0f2f3;font-size:12px}
+tr:last-child td{border-bottom:0}
+.status{
+  display:inline-block;padding:6px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;background:#fff3df;color:#a36b20;
+}
+.status.verified{background:#e5f5ed;color:#218052}
+.status.rejected{background:#fdeaea;color:#b93c3c}
+.action-btn{
+  border:0;padding:8px 10px;border-radius:6px;
+  font-size:11px;font-weight:bold;margin:2px;
+}
+.verify-btn{background:#e5f5ed;color:#218052}
+.reject-btn{background:#fdeaea;color:#b93c3c}
+.view-btn{background:#edf3f5;color:var(--primary)}
+.empty{
+  text-align:center;padding:35px 15px;color:var(--muted);
+  font-size:13px;
+}
+.empty-icon{font-size:30px;margin-bottom:10px}
+
+/* LOADING SKELETONS */
+.skeleton{
+  height:27px;border-radius:6px;
+  background:linear-gradient(90deg,#eef1f2 25%,#f8f9fa 50%,#eef1f2 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{to{background-position:-200% 0}}
+.stat-value.loading-value{color:transparent}
+
+/* PLACEHOLDER MODULES */
+.module-placeholder{
+  background:white;border:1px solid var(--border);
+  border-radius:13px;padding:45px 20px;text-align:center;
+}
+.module-placeholder .big-icon{font-size:38px;margin-bottom:14px}
+.module-placeholder h3{font-size:17px;margin-bottom:8px}
+.module-placeholder p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* MODAL */
+.modal-backdrop{
+  position:fixed;inset:0;background:#102b32a8;
+  z-index:500;display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  background:white;border-radius:14px;padding:24px;
+  width:100%;max-width:430px;animation:fadeIn .2s ease;
+}
+.modal h3{font-size:17px;margin-bottom:9px}
+.modal p{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:15px}
+.modal textarea{
+  width:100%;min-height:105px;border:1px solid #ddd;
+  border-radius:8px;padding:12px;resize:vertical;font-size:13px;
+}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px}
+.modal-actions button{
+  border:0;padding:11px 16px;border-radius:7px;font-size:12px;
+}
+.cancel-btn{background:#edf0f1;color:#555}
+.confirm-reject{background:var(--red);color:white}
+
+/* NOTIFICATIONS */
+.toast{
+  position:fixed;right:20px;bottom:20px;z-index:1000;
+  background:#183b45;color:white;padding:14px 18px;
+  border-radius:9px;font-size:12px;max-width:320px;
+  box-shadow:0 8px 30px #0002;
+  opacity:0;transform:translateY(15px);pointer-events:none;
+  transition:.3s;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* RESPONSIVE */
+@media(max-width:1050px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0);box-shadow:10px 0 35px #0002}
+  .main{margin-left:0;width:100%}
+  .menu-toggle{display:block}
+  .topbar{padding:0 15px;height:62px}
+  .content{padding:22px 15px}
+  .welcome h2{font-size:20px}
+  .stats{gap:10px}
+  .stat-card{padding:14px}
+  .stat-value{font-size:22px}
+  .stat-label{font-size:11px}
+  .date-label{display:none}
+  .panel-header{padding:16px}
+  .panel-body{padding:13px}
+}
+@media(max-width:380px){
+  .stats{grid-template-columns:1fr}
+  .logout-btn{padding:8px;font-size:11px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- PREMIUM LOADING SCREEN -->
+<div id="loadingScreen">
+  <div class="loader-logo">ZW</div>
+  <div class="loader-ring"></div>
+  <div class="loader-text">Preparing your dashboard...</div>
+</div>
+
+<div class="app hidden" id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-name">Zomba Welfare<br>Management</div>
+      <div class="brand-sub">Together, we care.</div>
+    </div>
+
+    <div class="admin-label">Administration</div>
+
+    <nav class="nav">
+      <button class="active" data-section="dashboard">
+        <span class="nav-icon">▦</span> Dashboard
+      </button>
+      <button data-section="members">
+        <span class="nav-icon">♙</span> Member Management
+      </button>
+      <button data-section="payments">
+        <span class="nav-icon">⇄</span> Payment Verification
+      </button>
+      <button data-section="contributions">
+        <span class="nav-icon">◷</span> Contributions
+      </button>
+      <button data-section="activities">
+        <span class="nav-icon">♡</span> Welfare Activities
+      </button>
+      <button data-section="finance">
+        <span class="nav-icon">▤</span> Finance & Expenditure
+      </button>
+      <button data-section="reports">
+        <span class="nav-icon">▥</span> Reports & Analytics
+      </button>
+      <button data-section="announcements">
+        <span class="nav-icon">♢</span> Announcements
+      </button>
+      <button data-section="settings">
+        <span class="nav-icon">⚙</span> System Settings
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="profile-mini">
+        <div class="avatar" id="adminAvatar">A</div>
+        <div>
+          <strong id="adminName">Administrator</strong>
+          <small>System Administrator</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <header class="topbar">
+      <div class="top-left">
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <div class="page-heading" id="pageHeading">Dashboard</div>
+      </div>
+      <div class="top-right">
+        <span class="date-label" id="todayDate"></span>
+        <button class="logout-btn" id="logoutButton">Sign out ↗</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <section class="section active" id="section-dashboard">
+        <div class="welcome">
+          <h2>Welcome back, <span id="welcomeName">Administrator</span></h2>
+          <p>Here is an overview of your welfare management system.</p>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Registered Members</span>
+              <span class="stat-icon">♙</span>
+            </div>
+            <div class="stat-value" id="memberCount">—</div>
+            <div class="stat-note">Active member accounts</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Pending Payments</span>
+              <span class="stat-icon">◷</span>
+            </div>
+            <div class="stat-value" id="pendingCount">—</div>
+            <div class="stat-note">Awaiting your verification</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Paid Obligations</span>
+              <span class="stat-icon">✓</span>
+            </div>
+            <div class="stat-value" id="paidCount">—</div>
+            <div class="stat-note">Fully settled contribution months</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-top">
+              <span class="stat-label">Unpaid Obligations</span>
+              <span class="stat-icon">!</span>
+            </div>
+            <div class="stat-value" id="unpaidCount">—</div>
+            <div class="stat-note">Outstanding contribution months</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>Recent Payment Submissions</h3>
+              <p>Latest payments submitted by members</p>
+            </div>
+            <button class="action-btn view-btn" onclick="showSection('payments')">
+              View all
+            </button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Amount</th>
+                  <th>Transaction ID</th>
+                  <th>Month</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recentPayments">
+                <tr><td colspan="5">
+                  <div class="skeleton"></div>
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h3>System Overview</h3>
+              <p>Quick access to important administrative work</p>
+            </div>
+          </div>
+          <div class="panel-body" style="display:flex;flex-wrap:wrap;gap:10px">
+            <button class="action-btn view-btn" onclick="showSection('members')">Manage members</button>
+            <button class="action-btn view-btn" onclick="showSection('payments')">Verify payments</button>
+            <button class="action-btn view-btn" onclick="showSection('contributions')">View contributions</button>
+            <button class="action-btn view-btn" onclick="showSection('reports')">View reports</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MEMBERS -->
+      <section class="section" id="section-members">
+        <div class="welcome">
+          <h2>Member Management</h2>
+          <p>View registered welfare members.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div><h3>Registered Members</h3><p>Member account directory</p></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Account Role</th></tr>
+              </thead>
+              <tbody id="membersTable">
+                <tr><td colspan="4" class="empty">Loading members...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAYMENTS -->
+      <section class="section" id="section-payments">
+        <div class="welcome">
+          <h2>Payment Verification</h2>
+          <p>Review member payment submissions and confirm receipt before allocation.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div><h3>Pending Submissions</h3><p>Payments requiring administrator action</p></div>
+            <button class="action-btn view-btn" onclick="loadPayments()">↻ Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Amount</th>
+                  <th>Transaction ID</th>
+                  <th>Contribution Month</th>
+                  <th>Date Submitted</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTable">
+                <tr><td colspan="6" class="empty">Loading submissions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTRIBUTIONS -->
+      <section class="section" id="section-contributions">
+        <div class="welcome"><h2>Contribution Management</h2><p>Monitor monthly contribution obligations and payment progress.</p></div>
+        <div class="module-placeholder">
+          <div class="big-icon">◷</div>
+          <h3>Contribution Management</h3>
+          <p>This module will provide monthly contribution records, outstanding balances, penalties and wallet allocation management.</p>
+        </div>
+      </section>
+
+      <!-- ACTIVITIES -->
+      <section class="section" id="section-activities">
+        <div class="welcome"><h2>Welfare Activities</h2><p>Manage welfare cases, events and member support activities.</p></div>
+        <div class="module-placeholder">
+          <div class="big-icon">♡</div>
+          <h3>Welfare Activities</h3>
+          <p>This module will allow the administrator to record welfare cases, organise activities and monitor support provided to members.</p>
+        </div>
+      </section>
+
+      <!-- FINANCE -->
+      <section class="section" id="section-finance">
+        <div class="welcome"><h2>Finance & Expenditure</h2><p>Maintain transparent records of welfare funds and expenditure.</p></div>
+        <div class="module-placeholder">
+          <div class="big-icon">▤</div>
+          <h3>Finance & Expenditure</h3>
+          <p>This module will manage income, expenditure, receipts, financial balances and audit records.</p>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section class="section" id="section-reports">
+        <div class="welcome"><h2>Reports & Analytics</h2><p>Review welfare contribution and financial performance.</p></div>
+        <div class="module-placeholder">
+          <div class="big-icon">▥</div>
+          <h3>Reports & Analytics</h3>
+          <p>This module will provide contribution summaries, member statements, payment reports and downloadable financial reports.</p>
+        </div>
+      </section>
+
+      <!-- ANNOUNCEMENTS -->
+      <section class="section" id="section-announcements">
+        <div class="welcome"><h2>Announcements</h2><p>Communicate important information to welfare members.</p></div>
+        <div class="module-placeholder">
+          <div class="big-icon">♢</div>
+          <h3>Announcements & Notifications</h3>
+          <p>This module will allow the administrator to publish notices and send updates to members.</p>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="section" id="section-settings">
+        <div class="welcome"><h2>System Settings</h2><p>Manage important welfare system configurations.</p></div>
+        <div class="module-placeholder">
+          <div class="big-icon">⚙</div>
+          <h3>System Settings</h3>
+          <p>This module will manage contribution settings, official receiving accounts and other system configurations.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- REJECTION MODAL -->
+<div class="modal-backdrop" id="rejectModal">
+  <div class="modal">
+    <h3>Reject Payment Submission</h3>
+    <p>Please provide a reason for rejecting this payment. The member will be able to see the reason.</p>
+    <textarea id="rejectionReason" placeholder="Enter rejection reason..."></textarea>
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeRejectModal()">Cancel</button>
+      <button class="confirm-reject" id="confirmRejectButton">Reject Payment</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://emmdhxlcqbvpvpjsmshz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let pendingRejectId = null;
+let paymentCache = [];
+let memberCache = {};
+
+const $ = id => document.getElementById(id);
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
+}
+
+function formatMoney(value) {
+  return "MWK " + Number(value || 0).toLocaleString("en-US");
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return escapeHTML(value);
+  return date.toLocaleDateString("en-GB", {
+    day:"2-digit",month:"short",year:"numeric"
+  });
+}
+
+function formatMonth(value) {
+  if (!value) return "—";
+  const date = new Date(String(value).slice(0,10) + "T00:00:00");
+  if (Number.isNaN(date.getTime())) return escapeHTML(value);
+  return date.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
+}
+
+function showToast(message) {
+  const toast = $("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3500);
+}
+
+function setLoading(show) {
+  $("loadingScreen").classList.toggle("hidden", !show);
+  $("app").classList.toggle("hidden", show);
+}
+
+/* AUTHENTICATION AND ADMIN ROLE CHECK */
+async function initialise() {
+  try {
+    const {data,error} = await db.auth.getSession();
+    if (error) throw error;
+
+    if (!data.session) {
+      window.location.replace("index.html");
+      return;
+    }
+
+    currentUser = data.session.user;
+
+    const {data:roleData,error:roleError} = await db
+      .from("user_roles")
+      .select("role")
+      .eq("user_id",currentUser.id)
+      .maybeSingle();
+
+    if (roleError) throw roleError;
+
+    if (!roleData || roleData.role !== "administrator") {
+      await db.auth.signOut();
+      window.location.replace("index.html");
+      return;
+    }
+
+    const {data:profile} = await db
+      .from("profiles")
+      .select("full_name")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+    const name = profile?.full_name || "Administrator";
+
+    $("adminName").textContent = name;
+    $("welcomeName").textContent = name.split(" ")[0];
+    $("adminAvatar").textContent = name.charAt(0).toUpperCase();
+    $("todayDate").textContent = new Date().toLocaleDateString("en-GB",{
+      weekday:"short",day:"numeric",month:"short",year:"numeric"
+    });
+
+    setLoading(false);
+    await loadDashboard();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Unable to open administrator dashboard.");
+    setLoading(false);
+  }
+}
+
+/* NAVIGATION */
+function showSection(section) {
+  document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
+  const target = $("section-" + section);
+  if (target) target.classList.add("active");
+
+  document.querySelectorAll(".nav button").forEach(button => {
+    button.classList.toggle("active",button.dataset.section === section);
+  });
+
+  const activeButton = document.querySelector(`.nav button[data-section="${section}"]`);
+  $("pageHeading").textContent = activeButton
+    ? activeButton.textContent.trim()
+    : "Dashboard";
+
+  $("sidebar").classList.remove("open");
+
+  if (section === "members") loadMembers();
+  if (section === "payments") loadPayments();
+}
+
+document.querySelectorAll(".nav button").forEach(button => {
+  button.addEventListener("click",() => showSection(button.dataset.section));
+});
+
+$("menuToggle").addEventListener("click",() => {
+  $("sidebar").classList.toggle("open");
+});
+
+/* DASHBOARD DATA */
+async function getCount(table, filters = []) {
+  let query = db.from(table).select("*",{count:"exact",head:true});
+  filters.forEach(([column,value]) => query = query.eq(column,value));
+  const {count,error} = await query;
+  if (error) {
+    console.error("Count error:",table,error);
+    return null;
+  }
+  return count ?? 0;
+}
+
+async function loadDashboard() {
+  const [members,pending,paid,unpaid] = await Promise.all([
+    getCount("profiles"),
+    getCount("payment_submissions",[["status","pending"]]),
+    getCount("contribution_obligations",[["status","paid"]]),
+    getCount("contribution_obligations",[["status","unpaid"]])
+  ]);
+
+  $("memberCount").textContent = members === null ? "—" : members;
+  $("pendingCount").textContent = pending === null ? "—" : pending;
+  $("paidCount").textContent = paid === null ? "—" : paid;
+  $("unpaidCount").textContent = unpaid === null ? "—" : unpaid;
+
+  await loadRecentPayments();
+}
+
+/* MEMBER DIRECTORY */
+async function loadMembers() {
+  $("membersTable").innerHTML =
+    '<tr><td colspan="4" class="empty">Loading members...</td></tr>';
+
+  const {data:profiles,error} = await db
+    .from("profiles")
+    .select("id,full_name,email,phone_number")
+    .order("full_name");
+
+  if (error) {
+    console.error(error);
+    $("membersTable").innerHTML =
+      '<tr><td colspan="4" class="empty">Unable to load members. Check database permissions.</td></tr>';
+    return;
+  }
+
+  const {data:roles,error:roleError} = await db
+    .from("user_roles")
+    .select("user_id,role");
+
+  if (roleError) console.error(roleError);
+
+  const roleMap = {};
+  (roles || []).forEach(r => roleMap[r.user_id] = r.role);
+
+  const members = (profiles || []).filter(p => roleMap[p.id] === "member");
+
+  if (!members.length) {
+    $("membersTable").innerHTML =
+      '<tr><td colspan="4" class="empty">No registered members found.</td></tr>';
+    return;
+  }
+
+  $("membersTable").innerHTML = members.map(member => `
+    <tr>
+      <td><strong>${escapeHTML(member.full_name || "Unnamed member")}</strong></td>
+      <td>${escapeHTML(member.email || "—")}</td>
+      <td>${escapeHTML(member.phone_number || "—")}</td>
+      <td><span class="status verified">Member</span></td>
+    </tr>
+  `).join("");
+}
+
+/* PAYMENT DATA */
+async function fetchPayments(status = null) {
+  let query = db.from("payment_submissions")
+    .select("*")
+    .order("created_at",{ascending:false})
+    .limit(100);
+
+  if (status) query = query.eq("status",status);
+
+  const {data,error} = await query;
+  if (error) throw error;
+
+  return data || [];
+}
+
+async function fetchMemberNames(rows) {
+  const ids = [...new Set(rows.map(row => row.member_id).filter(Boolean))];
+  if (!ids.length) return {};
+
+  const {data,error} = await db
+    .from("profiles")
+    .select("id,full_name")
+    .in("id",ids);
+
+  if (error) {
+    console.error(error);
+    return {};
+  }
+
+  const names = {};
+  (data || []).forEach(p => names[p.id] = p.full_name || "Member");
+  return names;
+}
+
+function getPaymentAmount(row) {
+  return row.amount ?? row.payment_amount ?? row.transaction_amount ?? 0;
+}
+
+function getTransactionId(row) {
+  return row.transaction_id ?? row.transaction_reference ?? row.reference ?? "—";
+}
+
+function getContributionMonth(row) {
+  return row.contribution_month ?? row.intended_month ?? null;
+}
+
+function paymentStatusBadge(status) {
+  const safe = String(status || "pending").toLowerCase();
+  const css = ["verified","rejected"].includes(safe) ? safe : "";
+  return `<span class="status ${css}">${escapeHTML(safe)}</span>`;
+}
+
+async function loadRecentPayments() {
+  const body = $("recentPayments");
+  body.innerHTML = '<tr><td colspan="5" class="empty">Loading recent submissions...</td></tr>';
+
+  try {
+    const rows = await fetchPayments();
+    const names = await fetchMemberNames(rows);
+    paymentCache = rows;
+
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="5" class="empty">No payment submissions yet.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = rows.slice(0,8).map(row => `
+      <tr>
+        <td>${escapeHTML(names[row.member_id] || "Member")}</td>
+        <td>${formatMoney(getPaymentAmount(row))}</td>
+        <td>${escapeHTML(getTransactionId(row))}</td>
+        <td>${formatMonth(getContributionMonth(row))}</td>
+        <td>${paymentStatusBadge(row.status)}</td>
+      </tr>
+    `).join("");
+
+  } catch(error) {
+    console.error(error);
+    body.innerHTML = '<tr><td colspan="5" class="empty">Unable to load payment records.</td></tr>';
+  }
+}
+
+async function loadPayments() {
+  const body = $("paymentsTable");
+  body.innerHTML = '<tr><td colspan="6" class="empty">Loading payment submissions...</td></tr>';
+
+  try {
+    const rows = await fetchPayments("pending");
+    const names = await fetchMemberNames(rows);
+    paymentCache = rows;
+    memberCache = names;
+
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="6" class="empty"><div class="empty-icon">✓</div>No pending payments. You are all caught up!</td></tr>';
+      return;
+    }
+
+    body.innerHTML = rows.map(row => `
+      <tr>
+        <td><strong>${escapeHTML(names[row.member_id] || "Member")}</strong></td>
+        <td>${formatMoney(getPaymentAmount(row))}</td>
+        <td>${escapeHTML(getTransactionId(row))}</td>
+        <td>${formatMonth(getContributionMonth(row))}</td>
+        <td>${formatDate(row.created_at)}</td>
+        <td>
+          <button class="action-btn view-btn" onclick="viewPayment('${row.id}')">View</button>
+          <button class="action-btn verify-btn" onclick="verifyPayment('${row.id}')">Verify</button>
+          <button class="action-btn reject-btn" onclick="openRejectModal('${row.id}')">Reject</button>
+        </td>
+      </tr>
+    `).join("");
+
+  } catch(error) {
+    console.error(error);
+    body.innerHTML = '<tr><td colspan="6" class="empty">Unable to load payment submissions. Check database access.</td></tr>';
+  }
+}
+
+/* VIEW PAYMENT DETAILS */
+function viewPayment(id) {
+  const row = paymentCache.find(p => p.id === id);
+  if (!row) return;
+
+  const originalMessage =
+    row.original_message ??
+    row.transaction_message ??
+    row.sms_message ??
+    row.raw_message ??
+    "No original transaction message found.";
+
+  const member = memberCache[row.member_id] || "Member";
+
+  alert(
+    "PAYMENT DETAILS\n\n" +
+    "Member: " + member + "\n" +
+    "Amount: " + formatMoney(getPaymentAmount(row)) + "\n" +
+    "Transaction ID: " + getTransactionId(row) + "\n" +
+    "Contribution month: " + formatMonth(getContributionMonth(row)) + "\n" +
+    "Date submitted: " + formatDate(row.created_at) + "\n\n" +
+    "ORIGINAL TRANSACTION MESSAGE\n" + originalMessage
+  );
+}
+
+/* VERIFY PAYMENT */
+async function verifyPayment(id) {
+  const row = paymentCache.find(p => p.id === id);
+  if (!row) return;
+
+  const proceed = confirm(
+    "Have you independently confirmed that this payment reached the official welfare account?\n\n" +
+    "The system will only allocate the payment after your confirmation."
+  );
+
+  if (!proceed) return;
+
+  try {
+    const button = document.querySelector(`button[onclick="verifyPayment('${id}')"]`);
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Processing...";
+    }
+
+    const {data,error} = await db.rpc("process_payment_submission",{
+      p_payment_id:id,
+      p_decision:"verify",
+      p_rejection_reason:null
+    });
+
+    if (error) throw error;
+
+    showToast("Payment verified and processed successfully.");
+    await Promise.all([loadPayments(),loadDashboard()]);
+
+  } catch(error) {
+    console.error(error);
+    showToast(error.message || "Payment verification failed.");
+    await loadPayments();
+  }
+}
+
+/* REJECT PAYMENT */
+function openRejectModal(id) {
+  pendingRejectId = id;
+  $("rejectionReason").value = "";
+  $("rejectModal").classList.add("show");
+}
+
+function closeRejectModal() {
+  pendingRejectId = null;
+  $("rejectModal").classList.remove("show");
+}
+
+$("confirmRejectButton").addEventListener("click",async function() {
+  const reason = $("rejectionReason").value.trim();
+
+  if (!reason) {
+    showToast("Please provide a rejection reason.");
+    return;
+  }
+
+  if (!pendingRejectId) return;
+
+  const id = pendingRejectId;
+  this.disabled = true;
+  this.textContent = "Processing...";
+
+  try {
+    const {error} = await db.rpc("process_payment_submission",{
+      p_payment_id:id,
+      p_decision:"reject",
+      p_rejection_reason:reason
+    });
+
+    if (error) throw error;
+
+    closeRejectModal();
+    showToast("Payment submission rejected.");
+    await Promise.all([loadPayments(),loadDashboard()]);
+
+  } catch(error) {
+    console.error(error);
+    showToast(error.message || "Unable to reject payment.");
+  } finally {
+    this.disabled = false;
+    this.textContent = "Reject Payment";
+  }
+});
+
+/* SIGN OUT */
+$("logoutButton").addEventListener("click",async function() {
+  const confirmed = confirm("Are you sure you want to sign out?");
+  if (!confirmed) return;
+
+  const {error} = await db.auth.signOut();
+  if (error) {
+    showToast(error.message);
+    return;
+  }
+
+  window.location.replace("index.html");
+});
+
+/* KEEP DASHBOARD SESSION VALID */
+db.auth.onAuthStateChange((event,session) => {
+  if (event === "SIGNED_OUT" || !session) {
+    window.location.replace("index.html");
+  }
+});
+
+initialise();
+</script>
+</body>
+</html>
