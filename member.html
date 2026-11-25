@@ -130,9 +130,7 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
    <button class="icon-btn mobile-menu" onclick="toggleSidebar()">☰</button>
    <div><h2 id="pageHeading">Dashboard</h2><p id="todayText">Your welfare account overview</p></div>
   </div>
-  <div class="top-actions">
-   <div class="avatar" id="topAvatar">M</div>
-  </div>
+  <div class="top-actions"><div class="avatar" id="topAvatar">M</div></div>
  </header>
 
 <section class="section active" id="page-dashboard">
@@ -170,21 +168,23 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
 </section>
 
 <section class="section" id="page-contributions">
- <h2 class="page-title">My Contributions</h2><p class="page-subtitle">Your monthly welfare contribution obligations and payment status.</p>
+ <h2 class="page-title">My Contributions</h2>
+ <p class="page-subtitle">Your monthly welfare contribution obligations and payment status.</p>
  <div class="panel">
   <div class="table-wrap"><table><thead><tr><th>Month</th><th>Contribution</th><th>Penalty</th><th>Total Due</th><th>Paid</th><th>Status</th></tr></thead><tbody id="contributionRows"><tr><td colspan="6" class="empty">Loading records...</td></tr></tbody></table></div>
  </div>
 </section>
 
 <section class="section" id="page-submit">
- <h2 class="page-title">Submit Payment</h2><p class="page-subtitle">Paste your transaction confirmation message to submit a payment for verification.</p>
+ <h2 class="page-title">Submit Payment</h2>
+ <p class="page-subtitle">Paste your transaction confirmation message to submit a payment for verification.</p>
  <div class="content-grid">
   <div class="panel">
    <div class="form-group"><label>Contribution month</label><select id="paymentMonth"><option value="">Select contribution month</option></select></div>
    <div class="form-group"><label>Full transaction SMS</label><textarea id="paymentSms" rows="6" placeholder="Paste the complete Airtel Money, TNM Mpamba or National Bank transaction message here..."></textarea></div>
    <div class="notice" style="margin-bottom:15px">The system will extract the transaction details for review. Transaction charges are not counted as contributions. Your payment will remain pending until the administrator verifies receipt of the funds.</div>
    <button class="primary-btn" id="submitPaymentBtn">Submit for Verification</button>
-   <p id="submitMessage" style="font-size:11px;margin-top:12px"></p>
+   <p id="submitMessage" style="font-size:11px;margin-top:12px;line-height:1.6"></p>
   </div>
   <div class="panel">
    <div class="panel-heading"><h3>Official Welfare Accounts</h3></div>
@@ -197,11 +197,12 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
 </section>
 
 <section class="section" id="page-wallet">
- <h2 class="page-title">My Welfare Wallet</h2><p class="page-subtitle">Your unallocated verified payment credit.</p>
+ <h2 class="page-title">My Welfare Wallet</h2>
+ <p class="page-subtitle">Your unallocated verified payment credit.</p>
  <div class="panel">
   <span style="font-size:12px;color:#777">Available wallet credit</span>
   <div class="wallet-number" id="walletBalance">MWK 0</div>
-  <p style="font-size:11px;color:#777">Excess payments remain here until allocated to an eligible contribution month.</p>
+  <p style="font-size:11px;color:#777">Any excess payment that cannot settle the next full contribution remains here as unallocated credit.</p>
  </div>
  <div class="panel">
   <div class="panel-heading"><h3>Wallet Transactions</h3></div>
@@ -210,14 +211,16 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
 </section>
 
 <section class="section" id="page-history">
- <h2 class="page-title">Payment History</h2><p class="page-subtitle">All payment submissions and their verification status.</p>
+ <h2 class="page-title">Payment History</h2>
+ <p class="page-subtitle">All payment submissions and their verification status.</p>
  <div class="panel">
   <div class="table-wrap"><table><thead><tr><th>Date Submitted</th><th>Transaction Reference</th><th>Amount</th><th>Month</th><th>Status</th></tr></thead><tbody id="historyRows"><tr><td colspan="5" class="empty">Loading payment history...</td></tr></tbody></table></div>
  </div>
 </section>
 
 <section class="section" id="page-activities">
- <h2 class="page-title">Welfare Activities</h2><p class="page-subtitle">Updates and information about team welfare activities.</p>
+ <h2 class="page-title">Welfare Activities</h2>
+ <p class="page-subtitle">Updates and information about team welfare activities.</p>
  <div class="panel"><div class="empty">No welfare activities have been published yet.</div></div>
 </section>
 </main>
@@ -241,19 +244,23 @@ const $=id=>document.getElementById(id);
 const money=value=>'MWK '+Number(value||0).toLocaleString('en-US');
 const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateText=value=>value?new Date(value).toLocaleDateString('en-GB'):'—';
+
 const monthText=value=>{
  if(!value)return '—';
  const d=new Date(value+'T00:00:00');
  return d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
 };
+
 const toast=message=>{
  $('toast').textContent=message;
  $('toast').style.display='block';
  setTimeout(()=>$('toast').style.display='none',3500);
 };
+
 const showError=message=>{
  $('loader').innerHTML='<div class="logo-loader">ZW</div><strong>Unable to load dashboard</strong><p style="font-size:12px;color:#777;max-width:300px;text-align:center">'+escapeHTML(message)+'</p><button class="primary-btn" onclick="location.reload()">Try Again</button><button class="secondary-btn" onclick="location.href=\'index.html\'">Return to Login</button>';
 };
+
 const hideLoader=()=>{
  $('loader').style.display='none';
  $('app').style.display='block';
@@ -262,15 +269,18 @@ const hideLoader=()=>{
 async function initialise(){
  try{
   if(!window.supabase?.createClient)throw new Error('Supabase library could not load. Check your internet connection.');
+
   db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
   const {data:{session},error:sessionError}=await db.auth.getSession();
   if(sessionError)throw sessionError;
   if(!session){location.replace('index.html');return;}
+
   currentUser=session.user;
 
   const {data:roleData,error:roleError}=await db.from('user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();
   if(roleError)throw roleError;
+
   if(roleData?.role!=='member'){
    if(roleData?.role==='administrator')location.replace('admin.html');
    else location.replace('index.html');
@@ -279,8 +289,11 @@ async function initialise(){
 
   const {data:profileData,error:profileError}=await db.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
   if(profileError)throw profileError;
+
   profile=profileData||{};
+
   const name=profile.full_name||currentUser.email?.split('@')[0]||'Member';
+
   $('welcomeName').textContent='Welcome back, '+name+'!';
   $('sideName').textContent=name;
   $('sideAvatar').textContent=name.charAt(0).toUpperCase();
@@ -289,8 +302,10 @@ async function initialise(){
 
   bindNavigation();
   hideLoader();
+
   await loadDashboard();
   populateMonths();
+
  }catch(error){
   console.error(error);
   showError(error.message||'An unexpected error occurred.');
@@ -301,22 +316,35 @@ function bindNavigation(){
  document.querySelectorAll('.nav-btn[data-page]').forEach(button=>{
   button.addEventListener('click',()=>showPage(button.dataset.page));
  });
+
  $('logoutBtn').addEventListener('click',async()=>{
   const {error}=await db.auth.signOut();
   if(error){toast(error.message);return;}
   location.replace('index.html');
  });
+
  $('submitPaymentBtn').addEventListener('click',submitPayment);
 }
 
 window.showPage=async page=>{
  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
  document.querySelectorAll('.nav-btn[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+
  $('page-'+page)?.classList.add('active');
- const titles={dashboard:'Dashboard',contributions:'My Contributions',submit:'Submit Payment',wallet:'My Welfare Wallet',history:'Payment History',activities:'Welfare Activities'};
+
+ const titles={
+  dashboard:'Dashboard',
+  contributions:'My Contributions',
+  submit:'Submit Payment',
+  wallet:'My Welfare Wallet',
+  history:'Payment History',
+  activities:'Welfare Activities'
+ };
+
  $('pageHeading').textContent=titles[page]||'Dashboard';
  $('sidebar').classList.remove('open');
  $('mobileOverlay').classList.remove('show');
+
  if(page==='dashboard'||page==='contributions'||page==='history'||page==='wallet'){
   await loadDashboard();
   populateMonths();
@@ -335,9 +363,11 @@ async function loadDashboard(){
    db.from('payment_submissions').select('*').eq('member_id',currentUser.id).order('created_at',{ascending:false}),
    db.from('member_wallet_transactions').select('*').eq('member_id',currentUser.id).order('created_at',{ascending:false})
   ]);
+
   if(obRes.error)throw obRes.error;
   if(payRes.error)throw payRes.error;
   if(walletRes.error)throw walletRes.error;
+
   obligations=obRes.data||[];
   payments=payRes.data||[];
   const walletRows=walletRes.data||[];
@@ -347,7 +377,7 @@ async function loadDashboard(){
   const pending=payments.filter(p=>p.status==='pending').length;
   const paid=obligations.filter(o=>o.status==='paid').length;
 
-  // Calculate wallet balance using credits minus debits.
+  // Wallet balance = all credits minus all debits.
   const wallet=walletRows.reduce((sum,t)=>{
    return sum+(t.direction==='credit'?Number(t.amount||0):-Number(t.amount||0));
   },0);
@@ -362,6 +392,7 @@ async function loadDashboard(){
   renderObligations();
   renderPayments();
   renderWallet(walletRows);
+
  }catch(error){
   console.error(error);
   toast('Could not load records: '+error.message);
@@ -375,8 +406,13 @@ function statusHTML(status){
 
 function renderRecent(){
  const rows=payments.slice(0,5);
+
  $('recentPayments').innerHTML=rows.length
- ?rows.map(p=>`<tr><td>${escapeHTML(p.transaction_id||'—')}</td><td>${money(p.amount)}</td><td>${statusHTML(p.status)}</td></tr>`).join('')
+ ?rows.map(p=>`<tr>
+   <td>${escapeHTML(p.transaction_id||'—')}</td>
+   <td>${money(p.amount)}</td>
+   <td>${statusHTML(p.status)}</td>
+  </tr>`).join('')
  :'<tr><td colspan="3" class="empty">No payment submissions yet.</td></tr>';
 }
 
@@ -397,6 +433,7 @@ function renderPayments(){
  $('historyRows').innerHTML=payments.length
  ?payments.map(p=>{
     const obligation=obligations.find(o=>o.id===p.selected_obligation_id);
+
     return `<tr>
      <td>${dateText(p.created_at)}</td>
      <td>${escapeHTML(p.transaction_id||'—')}</td>
@@ -442,6 +479,7 @@ async function submitPayment(){
  }
 
  const obligation=obligations.find(o=>o.id===obligationId);
+
  if(!obligation){
   message.style.color='#bd4141';
   message.textContent='Selected contribution month could not be found. Refresh the page.';
@@ -464,40 +502,53 @@ async function submitPayment(){
   if(error)throw error;
 
   const parsed=data?.parsed||data?.data||data;
+
   if(!parsed)throw new Error('The SMS parser returned no transaction details.');
 
+  // Read transaction details returned by the SMS parser.
   const transactionId=parsed.transaction_id||parsed.reference||parsed.transaction_reference;
-  const amount=Number(parsed.amount||parsed.transaction_amount);
-  message.style.color='#225967';
-message.textContent='Parser response: '+JSON.stringify(parsed);
-button.disabled=false;
-button.textContent='Submit for Verification';
-return;
+  const amount=Number(parsed.amount??parsed.transaction_amount);
+  const transactionDate=parsed.transaction_date||null;
+  const provider=parsed.provider||'Unknown';
 
   if(!transactionId||!Number.isFinite(amount)||amount<=0){
    throw new Error('The parser could not identify a valid transaction reference and amount. Please check the SMS.');
   }
 
-  if(parsed.recipient_match===false||parsed.recipient_matches===false||parsed.recipient_mismatch){
-   throw new Error('The SMS recipient does not match an official welfare receiving account. Please check the transfer details.');
+  // Match the actual recipient field returned by the parser.
+  if(
+   parsed.recipient_matches_welfare_account===false||
+   parsed.recipient_match===false||
+   parsed.recipient_matches===false||
+   parsed.recipient_mismatch===true
+  ){
+   const recipient=parsed.recipient||'unknown';
+   const official=parsed.registered_welfare_account||'the registered welfare account';
+
+   throw new Error(
+    'This transaction was sent to '+recipient+', not the official welfare account '+official+'. Please check the transfer.'
+   );
   }
 
   if(parsed.requires_manual_review===true||parsed.manual_review===true){
-   throw new Error('This SMS requires administrator review before it can be submitted. Contact the administrator.');
+   throw new Error('This SMS requires administrator review. Please contact the administrator.');
   }
 
+  // Partial payments are not accepted.
   const outstanding=Number(obligation.amount_due||0)-Number(obligation.amount_paid||0);
 
   if(amount<outstanding){
    throw new Error('Partial payments are not accepted. The selected month requires '+money(outstanding)+'.');
   }
 
-  // Submit using the actual database column name.
+  // Insert using the actual payment_submissions database columns.
   const {error:insertError}=await db.from('payment_submissions').insert({
    member_id:currentUser.id,
    selected_obligation_id:obligation.id,
    amount:amount,
    transaction_id:transactionId,
+   transaction_date:transactionDate,
+   provider:provider,
    original_message:sms
   });
 
