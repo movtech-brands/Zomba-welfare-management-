@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zomba Welfare Management</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     :root {
       --primary: #2E7382;
@@ -125,6 +123,7 @@
       font-size: 13px;
       display: none;
       line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
     .error {
@@ -138,7 +137,7 @@
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     .footer {
@@ -148,6 +147,9 @@
       font-size: 11px;
     }
   </style>
+
+  <!-- Supabase browser library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 
 <body>
@@ -159,35 +161,35 @@
       <p>Together, we care.</p>
     </div>
 
-    <!-- LOGIN FORM -->
+    <!-- LOGIN -->
     <div id="loginSection">
       <h2>Member Login</h2>
 
       <form id="loginForm">
 
         <div class="field">
-          <label>Email Address</label>
+          <label for="loginEmail">Email Address</label>
           <input
             type="email"
             id="loginEmail"
             placeholder="Enter your email"
+            autocomplete="username"
             required
           >
         </div>
 
         <div class="field">
-          <label>Password</label>
+          <label for="loginPassword">Password</label>
           <input
             type="password"
             id="loginPassword"
             placeholder="Enter your password"
+            autocomplete="current-password"
             required
           >
         </div>
 
-        <button type="submit" id="loginButton">
-          Login
-        </button>
+        <button type="submit" id="loginButton">Login</button>
 
       </form>
 
@@ -197,50 +199,53 @@
       </div>
     </div>
 
-
-    <!-- SIGNUP FORM -->
+    <!-- SIGNUP -->
     <div id="signupSection" class="hidden">
       <h2>Create Account</h2>
 
       <form id="signupForm">
 
         <div class="field">
-          <label>Full Name</label>
+          <label for="fullName">Full Name</label>
           <input
             type="text"
             id="fullName"
             placeholder="Enter your full name"
+            autocomplete="name"
             required
           >
         </div>
 
         <div class="field">
-          <label>Phone Number</label>
+          <label for="phoneNumber">Phone Number</label>
           <input
             type="tel"
             id="phoneNumber"
             placeholder="Enter your phone number"
+            autocomplete="tel"
             required
           >
         </div>
 
         <div class="field">
-          <label>Personal Email Address</label>
+          <label for="signupEmail">Personal Email Address</label>
           <input
             type="email"
             id="signupEmail"
             placeholder="Enter your email"
+            autocomplete="email"
             required
           >
         </div>
 
         <div class="field">
-          <label>Password</label>
+          <label for="signupPassword">Password</label>
           <input
             type="password"
             id="signupPassword"
             placeholder="Create a password"
             minlength="8"
+            autocomplete="new-password"
             required
           >
         </div>
@@ -257,7 +262,7 @@
       </div>
     </div>
 
-    <div id="message" class="message"></div>
+    <div id="message" class="message" role="status"></div>
 
     <div class="footer">
       Zomba Welfare Management System
@@ -265,27 +270,24 @@
 
   </div>
 
-
 <script>
-  // SUPABASE CONFIGURATION
-  const SUPABASE_URL = "https://emmdhxlcqbvpvpjsmshz.supabase.co";
+(() => {
+  "use strict";
 
-  const SUPABASE_ANON_KEY =
+  const SUPABASE_URL =
+    "https://emmdhxlcqbvpvpjsmshz.supabase.co";
+
+  const SUPABASE_KEY =
     "sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm";
 
-  const supabase = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  let supabaseClient = null;
 
+  const $ = id => document.getElementById(id);
 
-  // ELEMENTS
-  const loginSection = document.getElementById("loginSection");
-  const signupSection = document.getElementById("signupSection");
-  const messageBox = document.getElementById("message");
+  const loginSection = $("loginSection");
+  const signupSection = $("signupSection");
+  const messageBox = $("message");
 
-
-  // DISPLAY MESSAGE
   function showMessage(message, type = "error") {
     messageBox.textContent = message;
     messageBox.className = "message " + type;
@@ -293,31 +295,49 @@
   }
 
   function clearMessage() {
-    messageBox.style.display = "none";
     messageBox.textContent = "";
+    messageBox.style.display = "none";
   }
 
+  function setButton(button, disabled, text) {
+    button.disabled = disabled;
+    button.textContent = text;
+  }
 
-  // SWITCH BETWEEN LOGIN AND SIGNUP
-  document.getElementById("showSignup").addEventListener("click", function(e) {
-    e.preventDefault();
+  function switchForm(showSignup) {
     clearMessage();
-    loginSection.classList.add("hidden");
-    signupSection.classList.remove("hidden");
+
+    loginSection.classList.toggle("hidden", showSignup);
+    signupSection.classList.toggle("hidden", !showSignup);
+  }
+
+  $("showSignup").addEventListener("click", event => {
+    event.preventDefault();
+    switchForm(true);
   });
 
-  document.getElementById("showLogin").addEventListener("click", function(e) {
-    e.preventDefault();
-    clearMessage();
-    signupSection.classList.add("hidden");
-    loginSection.classList.remove("hidden");
+  $("showLogin").addEventListener("click", event => {
+    event.preventDefault();
+    switchForm(false);
   });
 
+  // Create the Supabase client.
+  function initialiseSupabase() {
+    if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      throw new Error(
+        "The login service could not load. Please refresh the page or try again later."
+      );
+    }
 
-  // ROLE-BASED REDIRECTION
+    supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+  }
+
+  // Redirect according to the user's database role.
   async function redirectUser(user) {
-
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
@@ -325,12 +345,17 @@
 
     if (error) {
       console.error("Role lookup error:", error);
-      throw new Error("Unable to check your account role. Please try again.");
+      throw new Error(
+        "We could not verify your account role. Please try again."
+      );
     }
 
     if (!data) {
-      await supabase.auth.signOut();
-      throw new Error("No system role is assigned to your account. Contact the administrator.");
+      await supabaseClient.auth.signOut();
+
+      throw new Error(
+        "No system role is assigned to your account. Please contact the administrator."
+      );
     }
 
     if (data.role === "administrator") {
@@ -343,58 +368,76 @@
       return;
     }
 
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
 
-    throw new Error("Your account has an invalid role. Contact the administrator.");
+    throw new Error(
+      "Your account has an invalid role. Please contact the administrator."
+    );
   }
 
-
   // LOGIN
-  document.getElementById("loginForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
     clearMessage();
 
-    const button = document.getElementById("loginButton");
-    button.disabled = true;
-    button.textContent = "Signing in...";
+    const button = $("loginButton");
+
+    const email = $("loginEmail").value.trim();
+    const password = $("loginPassword").value;
+
+    if (!supabaseClient) {
+      showMessage("Login service is not ready. Please refresh the page.");
+      return;
+    }
+
+    setButton(button, true, "Signing in...");
 
     try {
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
-
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password
       });
 
       if (error) throw error;
 
+      if (!data.user) {
+        throw new Error("Login was unsuccessful. Please try again.");
+      }
+
       await redirectUser(data.user);
 
     } catch (error) {
-      showMessage(error.message || "Login failed. Please try again.");
-      button.disabled = false;
-      button.textContent = "Login";
+      console.error("Login error:", error);
+
+      showMessage(
+        error.message || "Login failed. Please check your details."
+      );
+
+      setButton(button, false, "Login");
     }
   });
 
-
-  // SIGN UP
-  document.getElementById("signupForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+  // REGISTRATION
+  $("signupForm").addEventListener("submit", async event => {
+    event.preventDefault();
     clearMessage();
 
-    const button = document.getElementById("signupButton");
-    button.disabled = true;
-    button.textContent = "Creating account...";
+    const button = $("signupButton");
+
+    const fullName = $("fullName").value.trim();
+    const phoneNumber = $("phoneNumber").value.trim();
+    const email = $("signupEmail").value.trim();
+    const password = $("signupPassword").value;
+
+    if (!supabaseClient) {
+      showMessage("Registration service is not ready. Please refresh.");
+      return;
+    }
+
+    setButton(button, true, "Creating account...");
 
     try {
-      const fullName = document.getElementById("fullName").value.trim();
-      const phoneNumber = document.getElementById("phoneNumber").value.trim();
-      const email = document.getElementById("signupEmail").value.trim();
-      const password = document.getElementById("signupPassword").value;
-
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
@@ -409,33 +452,37 @@
 
       if (data.session && data.user) {
         showMessage(
-          "Your account has been created. You can now access the system.",
+          "Your account has been created successfully.",
           "success"
         );
 
         await redirectUser(data.user);
+
       } else {
+        $("signupForm").reset();
+
         showMessage(
           "Your account has been created. Please check your email and click the verification link before logging in.",
           "success"
         );
-
-        document.getElementById("signupForm").reset();
       }
 
     } catch (error) {
-      showMessage(error.message || "Registration failed. Please try again.");
+      console.error("Registration error:", error);
+
+      showMessage(
+        error.message || "Registration failed. Please try again."
+      );
+
     } finally {
-      button.disabled = false;
-      button.textContent = "Create Account";
+      setButton(button, false, "Create Account");
     }
   });
 
-
-  // CHECK EXISTING SESSION
+  // Check whether a user is already signed in.
   async function checkExistingSession() {
     try {
-      const { data, error } = await supabase.auth.getSession();
+      const { data, error } = await supabaseClient.auth.getSession();
 
       if (error) throw error;
 
@@ -445,11 +492,24 @@
 
     } catch (error) {
       console.error("Session check:", error);
+
+      if (error.message) {
+        showMessage(error.message);
+      }
     }
   }
 
-  checkExistingSession();
+  // Start the application.
+  try {
+    initialiseSupabase();
+    checkExistingSession();
 
+  } catch (error) {
+    console.error("Application initialisation error:", error);
+    showMessage(error.message);
+  }
+
+})();
 </script>
 
 </body>
