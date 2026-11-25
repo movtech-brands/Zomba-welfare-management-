@@ -10,7 +10,7 @@
 :root{--teal:#2E7382;--teal-dark:#225967;--white:#fff;--grey:#F4F4F4;--text:#333;--muted:#777;--border:#e8ecee;--shadow:0 5px 22px rgba(0,0,0,.055)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--grey);color:var(--text);font-family:Inter,Arial,sans-serif}
-button,input,select{font:inherit}
+button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 #loader{position:fixed;inset:0;background:#fff;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
 .logo-loader{width:66px;height:66px;background:var(--teal);color:#fff;border-radius:21px;display:grid;place-items:center;font-size:24px;font-weight:800;animation:pulse 1.4s infinite}
@@ -72,6 +72,7 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal)}
 .primary-btn{background:var(--teal);color:#fff;border:0;border-radius:9px;padding:12px 18px;font-size:12px;font-weight:700}
 .primary-btn:hover{background:var(--teal-dark)}
+.primary-btn:disabled{opacity:.6;cursor:not-allowed}
 .secondary-btn{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 15px;font-size:12px}
 .wallet-number{font-size:28px;font-weight:800;color:var(--teal);margin:12px 0}
 .toast{position:fixed;bottom:20px;right:20px;background:#263b40;color:#fff;padding:13px 18px;border-radius:10px;font-size:12px;z-index:200;display:none;max-width:90%}
@@ -91,6 +92,7 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
 </style>
 </head>
 <body>
+
 <div id="loader">
  <div class="logo-loader">ZW</div>
  <strong>Zomba Welfare Management</strong>
@@ -199,7 +201,7 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
  <div class="panel">
   <span style="font-size:12px;color:#777">Available wallet credit</span>
   <div class="wallet-number" id="walletBalance">MWK 0</div>
-  <p style="font-size:11px;color:#777">Excess payments remain here until allocated by the administrator to an eligible contribution month.</p>
+  <p style="font-size:11px;color:#777">Excess payments remain here until allocated to an eligible contribution month.</p>
  </div>
  <div class="panel">
   <div class="panel-heading"><h3>Wallet Transactions</h3></div>
@@ -315,7 +317,10 @@ window.showPage=async page=>{
  $('pageHeading').textContent=titles[page]||'Dashboard';
  $('sidebar').classList.remove('open');
  $('mobileOverlay').classList.remove('show');
- if(page==='dashboard'||page==='contributions'||page==='history'||page==='wallet')await loadDashboard();
+ if(page==='dashboard'||page==='contributions'||page==='history'||page==='wallet'){
+  await loadDashboard();
+  populateMonths();
+ }
 };
 
 window.toggleSidebar=()=>{
@@ -341,7 +346,11 @@ async function loadDashboard(){
   const outstanding=obligations.reduce((sum,o)=>sum+Math.max(0,Number(o.amount_due||0)-Number(o.amount_paid||0)),0);
   const pending=payments.filter(p=>p.status==='pending').length;
   const paid=obligations.filter(o=>o.status==='paid').length;
-  const wallet=walletRows.reduce((sum,t)=>sum+Number(t.amount||0),0);
+
+  // Calculate wallet balance using credits minus debits.
+  const wallet=walletRows.reduce((sum,t)=>{
+   return sum+(t.direction==='credit'?Number(t.amount||0):-Number(t.amount||0));
+  },0);
 
   $('totalContributions').textContent=money(totalPaid);
   $('outstandingBalance').textContent=money(outstanding);
@@ -363,23 +372,56 @@ function statusHTML(status){
  const s=String(status||'unpaid').toLowerCase();
  return '<span class="status '+escapeHTML(s)+'">'+escapeHTML(s.charAt(0).toUpperCase()+s.slice(1))+'</span>';
 }
+
 function renderRecent(){
  const rows=payments.slice(0,5);
- $('recentPayments').innerHTML=rows.length?rows.map(p=>`<tr><td>${escapeHTML(p.transaction_id||p.transaction_reference||'—')}</td><td>${money(p.amount)}</td><td>${statusHTML(p.status)}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">No payment submissions yet.</td></tr>';
+ $('recentPayments').innerHTML=rows.length
+ ?rows.map(p=>`<tr><td>${escapeHTML(p.transaction_id||'—')}</td><td>${money(p.amount)}</td><td>${statusHTML(p.status)}</td></tr>`).join('')
+ :'<tr><td colspan="3" class="empty">No payment submissions yet.</td></tr>';
 }
+
 function renderObligations(){
- $('contributionRows').innerHTML=obligations.length?obligations.map(o=>`<tr><td>${escapeHTML(monthText(o.contribution_month))}</td><td>${money(o.base_amount_due)}</td><td>${money(o.penalty_amount_due)}</td><td>${money(o.amount_due)}</td><td>${money(o.amount_paid)}</td><td>${statusHTML(o.status)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">No contribution obligations have been generated yet.</td></tr>';
+ $('contributionRows').innerHTML=obligations.length
+ ?obligations.map(o=>`<tr>
+   <td>${escapeHTML(monthText(o.contribution_month))}</td>
+   <td>${money(o.base_amount_due)}</td>
+   <td>${money(o.penalty_amount_due)}</td>
+   <td>${money(o.amount_due)}</td>
+   <td>${money(o.amount_paid)}</td>
+   <td>${statusHTML(o.status)}</td>
+  </tr>`).join('')
+ :'<tr><td colspan="6" class="empty">No contribution obligations have been generated yet.</td></tr>';
 }
+
 function renderPayments(){
- $('historyRows').innerHTML=payments.length?payments.map(p=>`<tr><td>${dateText(p.created_at)}</td><td>${escapeHTML(p.transaction_id||p.transaction_reference||'—')}</td><td>${money(p.amount)}</td><td>${escapeHTML(monthText(p.contribution_month))}</td><td>${statusHTML(p.status)}</td></tr>`).join(''):'<tr><td colspan="5" class="empty">No payment history yet.</td></tr>';
+ $('historyRows').innerHTML=payments.length
+ ?payments.map(p=>{
+    const obligation=obligations.find(o=>o.id===p.selected_obligation_id);
+    return `<tr>
+     <td>${dateText(p.created_at)}</td>
+     <td>${escapeHTML(p.transaction_id||'—')}</td>
+     <td>${money(p.amount)}</td>
+     <td>${escapeHTML(monthText(obligation?.contribution_month))}</td>
+     <td>${statusHTML(p.status)}</td>
+    </tr>`;
+   }).join('')
+ :'<tr><td colspan="5" class="empty">No payment history yet.</td></tr>';
 }
+
 function renderWallet(rows){
- $('walletRows').innerHTML=rows.length?rows.map(t=>`<tr><td>${dateText(t.created_at)}</td><td>${escapeHTML(t.description||t.transaction_type||'Wallet transaction')}</td><td>${money(t.amount)}</td></tr>`).join(''):'<tr><td colspan="3" class="empty">No wallet transactions yet.</td></tr>';
+ $('walletRows').innerHTML=rows.length
+ ?rows.map(t=>`<tr>
+   <td>${dateText(t.created_at)}</td>
+   <td>${escapeHTML(t.description||t.transaction_type||'Wallet transaction')}</td>
+   <td>${t.direction==='debit'?'−':'+'}${money(t.amount)}</td>
+  </tr>`).join('')
+ :'<tr><td colspan="3" class="empty">No wallet transactions yet.</td></tr>';
 }
 
 function populateMonths(){
  const select=$('paymentMonth');
  select.innerHTML='<option value="">Select contribution month</option>';
+
  obligations.filter(o=>o.status!=='paid').forEach(o=>{
   const option=document.createElement('option');
   option.value=o.id;
@@ -392,54 +434,86 @@ async function submitPayment(){
  const obligationId=$('paymentMonth').value;
  const sms=$('paymentSms').value.trim();
  const message=$('submitMessage');
- if(!obligationId||!sms){message.style.color='#bd4141';message.textContent='Select a contribution month and paste the transaction SMS.';return;}
+
+ if(!obligationId||!sms){
+  message.style.color='#bd4141';
+  message.textContent='Select a contribution month and paste the transaction SMS.';
+  return;
+ }
+
  const obligation=obligations.find(o=>o.id===obligationId);
- if(!obligation){message.style.color='#bd4141';message.textContent='Selected contribution month could not be found. Refresh the page.';return;}
+ if(!obligation){
+  message.style.color='#bd4141';
+  message.textContent='Selected contribution month could not be found. Refresh the page.';
+  return;
+ }
 
  const button=$('submitPaymentBtn');
- button.disabled=true;button.textContent='Submitting...';
+ button.disabled=true;
+ button.textContent='Submitting...';
  message.textContent='';
+
  try{
-  const {data,error}=await db.functions.invoke('parse-payment-sms',{body:{message:sms,contribution_month:obligation.contribution_month}});
+  const {data,error}=await db.functions.invoke('parse-payment-sms',{
+   body:{
+    message:sms,
+    contribution_month:obligation.contribution_month
+   }
+  });
+
   if(error)throw error;
+
   const parsed=data?.parsed||data?.data||data;
   if(!parsed)throw new Error('The SMS parser returned no transaction details.');
 
   const transactionId=parsed.transaction_id||parsed.reference||parsed.transaction_reference;
   const amount=Number(parsed.amount||parsed.transaction_amount);
-  if(!transactionId||!Number.isFinite(amount)||amount<=0)throw new Error('The parser could not identify a valid transaction reference and amount. Please check the SMS.');
+
+  if(!transactionId||!Number.isFinite(amount)||amount<=0){
+   throw new Error('The parser could not identify a valid transaction reference and amount. Please check the SMS.');
+  }
 
   if(parsed.recipient_match===false||parsed.recipient_matches===false||parsed.recipient_mismatch){
    throw new Error('The SMS recipient does not match an official welfare receiving account. Please check the transfer details.');
   }
+
   if(parsed.requires_manual_review===true||parsed.manual_review===true){
    throw new Error('This SMS requires administrator review before it can be submitted. Contact the administrator.');
   }
 
   const outstanding=Number(obligation.amount_due||0)-Number(obligation.amount_paid||0);
-  if(amount<outstanding)throw new Error('Partial payments are not accepted. The selected month requires '+money(outstanding)+'.');
+
+  if(amount<outstanding){
+   throw new Error('Partial payments are not accepted. The selected month requires '+money(outstanding)+'.');
+  }
+
+  // Submit using the actual database column name.
   const {error:insertError}=await db.from('payment_submissions').insert({
    member_id:currentUser.id,
-   contribution_obligation_id:obligation.id,
-   contribution_month:obligation.contribution_month,
+   selected_obligation_id:obligation.id,
    amount:amount,
    transaction_id:transactionId,
-   original_message:sms,
-   status:'pending'
+   original_message:sms
   });
+
   if(insertError)throw insertError;
+
   message.style.color='#23834c';
   message.textContent='Payment submitted successfully. It is awaiting administrator verification.';
+
   $('paymentSms').value='';
   $('paymentMonth').value='';
+
   await loadDashboard();
   populateMonths();
+
  }catch(error){
   console.error(error);
   message.style.color='#bd4141';
   message.textContent=error.message||'Unable to submit payment.';
  }finally{
-  button.disabled=false;button.textContent='Submit for Verification';
+  button.disabled=false;
+  button.textContent='Submit for Verification';
  }
 }
 
