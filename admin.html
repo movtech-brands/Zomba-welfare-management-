@@ -1,108 +1,107 @@
+\<!DOCTYPE html>
+\<html lang="en">
+\<head>
+\<meta charset="UTF-8">
+\<meta name="viewport" content="width=device-width, initial-scale=1.0">
+\<title>Administrator | Zomba Welfare Management\</title>
+\<script src="[https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2](https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2)">\</script>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Administrator | Zomba Welfare Management</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
+\<style>
 :root {
-  --primary:#2E7382;
-  --primary-dark:#205866;
-  --light:#F4F4F4;
-  --white:#fff;
-  --text:#333;
-  --muted:#849199;
-  --border:#e9edef;
-  --green:#23966b;
-  --orange:#d88a32;
-  --red:#d95353;
-  --sidebar:#183b45;
+&#x20; \--primary:#2E7382;
+&#x20; \--primary-dark:#205866;
+&#x20; \--light:#F4F4F4;
+&#x20; \--white:#fff;
+&#x20; \--text:#333;
+&#x20; \--muted:#849199;
+&#x20; \--border:#e9edef;
+&#x20; \--green:#23966b;
+&#x20; \--orange:#d88a32;
+&#x20; \--red:#d95353;
+&#x20; \--sidebar:#183b45;
 }
 
-*{box-sizing:border-box;margin:0;padding:0}
+\*{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:var(--light);color:var(--text);min-height:100vh}
 button,input,select,textarea{font-family:inherit}
 button{cursor:pointer}
 .hidden{display:none!important}
 
-/* LOADING */
-#loadingScreen{
-  position:fixed;inset:0;background:#fff;z-index:9999;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:18px;
+/\* LOADING \*/
+\#loadingScreen{
+&#x20; position:fixed;inset:0;background:#fff;z-index:9999;
+&#x20; display:flex;align-items:center;justify-content:center;
+&#x20; flex-direction:column;gap:18px;
 }
 .loader-logo{
-  width:58px;height:58px;border-radius:18px;
-  background:var(--primary);color:white;
-  display:flex;align-items:center;justify-content:center;
-  font-size:25px;font-weight:bold;
-  animation:logoPulse 1.5s infinite ease-in-out;
+&#x20; width:58px;height:58px;border-radius:18px;
+&#x20; background:var(--primary);color:white;
+&#x20; display:flex;align-items:center;justify-content:center;
+&#x20; font-size:25px;font-weight:bold;
+&#x20; animation:logoPulse 1.5s infinite ease-in-out;
 }
 .loader-ring{
-  width:34px;height:34px;border:3px solid #e5eeee;
-  border-top-color:var(--primary);border-radius:50%;
-  animation:spin .8s linear infinite;
+&#x20; width:34px;height:34px;border:3px solid #e5eeee;
+&#x20; border-top-color:var(--primary);border-radius:50%;
+&#x20; animation:spin .8s linear infinite;
 }
 .loader-text{font-size:13px;color:#718087}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes logoPulse{
-  0%,100%{transform:scale(1);box-shadow:0 0 0 0 #2e738222}
-  50%{transform:scale(1.07);box-shadow:0 0 0 12px #2e738200}
+&#x20; 0%,100%{transform:scale(1);box-shadow:0 0 0 0 #2e738222}
+&#x20; 50%{transform:scale(1.07);box-shadow:0 0 0 12px #2e738200}
 }
 
-/* APP */
+/\* APP \*/
 .app{display:flex;min-height:100vh}
 .sidebar{
-  width:250px;background:var(--sidebar);color:white;
-  position:fixed;inset:0 auto 0 0;z-index:100;
-  display:flex;flex-direction:column;transition:transform .3s ease;
+&#x20; width:250px;background:var(--sidebar);color:white;
+&#x20; position:fixed;inset:0 auto 0 0;z-index:100;
+&#x20; display:flex;flex-direction:column;transition:transform .3s ease;
 }
 .brand{padding:25px 20px 22px;border-bottom:1px solid #ffffff18}
 .brand-name{font-size:18px;font-weight:700;line-height:1.4}
 .brand-sub{font-size:11px;color:#b9cbd0;margin-top:5px}
 .admin-label{
-  margin:22px 20px 10px;font-size:10px;
-  letter-spacing:1.5px;color:#9bb3ba;text-transform:uppercase;
+&#x20; margin:22px 20px 10px;font-size:10px;
+&#x20; letter-spacing:1.5px;color:#9bb3ba;text-transform:uppercase;
 }
 .nav{padding:0 12px;flex:1;overflow-y:auto}
 .nav button{
-  width:100%;border:0;background:transparent;color:#d5e1e4;
-  padding:13px 14px;margin:3px 0;border-radius:9px;
-  text-align:left;font-size:13px;display:flex;align-items:center;gap:12px;
+&#x20; width:100%;border:0;background:transparent;color:#d5e1e4;
+&#x20; padding:13px 14px;margin:3px 0;border-radius:9px;
+&#x20; text-align:left;font-size:13px;display:flex;align-items:center;gap:12px;
 }
 .nav button:hover,.nav button.active{background:#ffffff18;color:#fff}
 .nav-icon{width:20px;text-align:center;font-size:17px}
 .sidebar-bottom{padding:15px;border-top:1px solid #ffffff18}
 .profile-mini{display:flex;align-items:center;gap:10px;padding:8px}
 .avatar{
-  width:36px;height:36px;border-radius:50%;background:#d4ecdd;
-  color:var(--sidebar);display:flex;align-items:center;
-  justify-content:center;font-weight:bold;font-size:14px;
+&#x20; width:36px;height:36px;border-radius:50%;background:#d4ecdd;
+&#x20; color:var(--sidebar);display:flex;align-items:center;
+&#x20; justify-content:center;font-weight:bold;font-size:14px;
 }
 .profile-mini strong{font-size:12px;display:block}
 .profile-mini small{font-size:10px;color:#b9cbd0}
 
-/* MAIN */
+/\* MAIN \*/
 .main{margin-left:250px;width:calc(100% - 250px);min-height:100vh}
 .topbar{
-  height:70px;background:white;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 30px;position:sticky;top:0;z-index:50;
+&#x20; height:70px;background:white;border-bottom:1px solid var(--border);
+&#x20; display:flex;align-items:center;justify-content:space-between;
+&#x20; padding:0 30px;position:sticky;top:0;z-index:50;
 }
 .top-left{display:flex;align-items:center;gap:13px}
 .menu-toggle{
-  display:none;border:0;background:#f1f5f5;border-radius:8px;
-  width:38px;height:38px;font-size:20px;color:var(--primary);
+&#x20; display:none;border:0;background:#f1f5f5;border-radius:8px;
+&#x20; width:38px;height:38px;font-size:20px;color:var(--primary);
 }
 .page-heading{font-size:16px;font-weight:700}
 .top-right{display:flex;align-items:center;gap:15px}
 .date-label{font-size:12px;color:var(--muted)}
 .logout-btn{
-  border:1px solid var(--border);background:white;color:#555;
-  border-radius:8px;padding:9px 13px;font-size:12px;
+&#x20; border:1px solid var(--border);background:white;color:#555;
+&#x20; border-radius:8px;padding:9px 13px;font-size:12px;
 }
 .logout-btn:hover{border-color:var(--primary);color:var(--primary)}
 .content{padding:28px 30px;max-width:1500px;margin:auto}
@@ -110,33 +109,33 @@ button{cursor:pointer}
 .welcome h2{font-size:23px;margin-bottom:7px}
 .welcome p{font-size:13px;color:var(--muted)}
 
-/* CARDS */
+/\* CARDS \*/
 .stats{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:17px;margin-bottom:25px;
+&#x20; display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+&#x20; gap:17px;margin-bottom:25px;
 }
 .stat-card{
-  background:white;border:1px solid var(--border);
-  border-radius:13px;padding:20px;transition:.2s;
+&#x20; background:white;border:1px solid var(--border);
+&#x20; border-radius:13px;padding:20px;transition:.2s;
 }
 .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px #183b450d}
 .stat-top{display:flex;justify-content:space-between;align-items:center}
 .stat-label{font-size:12px;color:var(--muted)}
 .stat-icon{
-  width:37px;height:37px;border-radius:10px;background:#eaf3f4;
-  display:flex;align-items:center;justify-content:center;font-size:18px;
+&#x20; width:37px;height:37px;border-radius:10px;background:#eaf3f4;
+&#x20; display:flex;align-items:center;justify-content:center;font-size:18px;
 }
 .stat-value{font-size:27px;font-weight:700;margin-top:15px}
 .stat-note{font-size:11px;color:var(--muted);margin-top:6px}
 
-/* PANELS */
+/\* PANELS \*/
 .panel{
-  background:white;border:1px solid var(--border);
-  border-radius:13px;margin-bottom:22px;overflow:hidden;
+&#x20; background:white;border:1px solid var(--border);
+&#x20; border-radius:13px;margin-bottom:22px;overflow:hidden;
 }
 .panel-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:19px 21px;border-bottom:1px solid var(--border);gap:12px;
+&#x20; display:flex;align-items:center;justify-content:space-between;
+&#x20; padding:19px 21px;border-bottom:1px solid var(--border);gap:12px;
 }
 .panel-header h3{font-size:14px}
 .panel-header p{font-size:11px;color:var(--muted);margin-top:5px}
@@ -144,32 +143,32 @@ button{cursor:pointer}
 .section{display:none;animation:fadeIn .3s ease}
 .section.active{display:block}
 @keyframes fadeIn{
-  from{opacity:0;transform:translateY(7px)}
-  to{opacity:1;transform:translateY(0)}
+&#x20; from{opacity:0;transform:translateY(7px)}
+&#x20; to{opacity:1;transform:translateY(0)}
 }
 
-/* TABLES */
+/\* TABLES \*/
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:650px}
 th{
-  text-align:left;background:#f8fafb;color:#78868c;
-  font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:13px 15px;
+&#x20; text-align:left;background:#f8fafb;color:#78868c;
+&#x20; font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:13px 15px;
 }
 td{padding:15px;border-bottom:1px solid #f0f2f3;font-size:12px}
 tr:last-child td{border-bottom:0}
 .status{
-  display:inline-block;padding:6px 9px;border-radius:20px;
-  font-size:10px;font-weight:700;background:#fff3df;color:#a36b20;
+&#x20; display:inline-block;padding:6px 9px;border-radius:20px;
+&#x20; font-size:10px;font-weight:700;background:#fff3df;color:#a36b20;
 }
 .status.verified,.status.paid,.status.completed,.status.published{
-  background:#e5f5ed;color:#218052;
+&#x20; background:#e5f5ed;color:#218052;
 }
 .status.rejected,.status.closed{background:#fdeaea;color:#b93c3c}
 .status.ongoing{background:#eaf3f4;color:var(--primary)}
 .status.draft{background:#f0f1f2;color:#68757a}
 .action-btn{
-  border:0;padding:9px 12px;border-radius:7px;
-  font-size:11px;font-weight:bold;margin:2px;
+&#x20; border:0;padding:9px 12px;border-radius:7px;
+&#x20; font-size:11px;font-weight:bold;margin:2px;
 }
 .verify-btn{background:#e5f5ed;color:#218052}
 .reject-btn{background:#fdeaea;color:#b93c3c}
@@ -180,26 +179,26 @@ tr:last-child td{border-bottom:0}
 .empty{text-align:center;padding:35px 15px;color:var(--muted);font-size:13px}
 .empty-icon{font-size:30px;margin-bottom:10px}
 
-/* FORMS */
+/\* FORMS \*/
 .form-grid{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;
+&#x20; display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;
 }
 .form-group{margin-bottom:15px}
 .form-group.full{grid-column:1/-1}
 .form-group label{
-  display:block;font-size:12px;font-weight:700;
-  margin-bottom:7px;color:#526168;
+&#x20; display:block;font-size:12px;font-weight:700;
+&#x20; margin-bottom:7px;color:#526168;
 }
 .form-group input,.form-group select,.form-group textarea,
 .filter-select{
-  width:100%;border:1px solid #dfe5e7;border-radius:8px;
-  padding:12px;font-size:13px;background:white;color:var(--text);
-  outline:none;
+&#x20; width:100%;border:1px solid #dfe5e7;border-radius:8px;
+&#x20; padding:12px;font-size:13px;background:white;color:var(--text);
+&#x20; outline:none;
 }
 .form-group textarea{resize:vertical;min-height:85px}
 .form-group input:focus,.form-group select:focus,
 .form-group textarea:focus,.filter-select:focus{
-  border-color:var(--primary);box-shadow:0 0 0 3px #2e738214;
+&#x20; border-color:var(--primary);box-shadow:0 0 0 3px #2e738214;
 }
 .form-help{font-size:11px;color:var(--muted);margin-top:5px}
 .form-message{font-size:12px;margin-top:12px}
@@ -208,515 +207,462 @@ tr:last-child td{border-bottom:0}
 .filter-select{width:auto;min-width:170px;padding:9px 11px}
 .section-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .section-note{
-  background:#f5f9fa;border:1px solid #e6eff1;
-  border-radius:9px;padding:12px 14px;
-  color:#52666c;font-size:11px;line-height:1.6;margin-bottom:18px;
+&#x20; background:#f5f9fa;border:1px solid #e6eff1;
+&#x20; border-radius:9px;padding:12px 14px;
+&#x20; color:#52666c;font-size:11px;line-height:1.6;margin-bottom:18px;
 }
 
-/* PLACEHOLDERS */
+/\* PLACEHOLDERS \*/
 .module-placeholder{
-  background:white;border:1px solid var(--border);
-  border-radius:13px;padding:45px 20px;text-align:center;
+&#x20; background:white;border:1px solid var(--border);
+&#x20; border-radius:13px;padding:45px 20px;text-align:center;
 }
 .module-placeholder .big-icon{font-size:38px;margin-bottom:14px}
 .module-placeholder h3{font-size:17px;margin-bottom:8px}
 .module-placeholder p{font-size:13px;color:var(--muted);line-height:1.6}
 
-/* MODAL */
+/\* MODAL \*/
 .modal-backdrop{
-  position:fixed;inset:0;background:#102b32a8;z-index:500;
-  display:none;align-items:center;justify-content:center;padding:20px;
+&#x20; position:fixed;inset:0;background:#102b32a8;z-index:500;
+&#x20; display:none;align-items:center;justify-content:center;padding:20px;
 }
 .modal-backdrop.show{display:flex}
 .modal{
-  background:white;border-radius:14px;padding:24px;
-  width:100%;max-width:430px;animation:fadeIn .2s ease;
+&#x20; background:white;border-radius:14px;padding:24px;
+&#x20; width:100%;max-width:430px;animation:fadeIn .2s ease;
 }
 .modal h3{font-size:17px;margin-bottom:9px}
 .modal p{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:15px}
 .modal textarea{
-  width:100%;min-height:105px;border:1px solid #ddd;
-  border-radius:8px;padding:12px;resize:vertical;font-size:13px;
+&#x20; width:100%;min-height:105px;border:1px solid #ddd;
+&#x20; border-radius:8px;padding:12px;resize:vertical;font-size:13px;
 }
 .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px}
 .modal-actions button{border:0;padding:11px 16px;border-radius:7px;font-size:12px}
 .cancel-btn{background:#edf0f1;color:#555}
 .confirm-reject{background:var(--red);color:white}
 
-/* TOAST */
+/\* TOAST \*/
 .toast{
-  position:fixed;right:20px;bottom:20px;z-index:1000;
-  background:#183b45;color:white;padding:14px 18px;
-  border-radius:9px;font-size:12px;max-width:320px;
-  box-shadow:0 8px 30px #0002;opacity:0;transform:translateY(15px);
-  pointer-events:none;transition:.3s;
+&#x20; position:fixed;right:20px;bottom:20px;z-index:1000;
+&#x20; background:#183b45;color:white;padding:14px 18px;
+&#x20; border-radius:9px;font-size:12px;max-width:320px;
+&#x20; box-shadow:0 8px 30px #0002;opacity:0;transform:translateY(15px);
+&#x20; pointer-events:none;transition:.3s;
 }
 .toast.show{opacity:1;transform:translateY(0)}
 
-
-/* FINANCE AND REPORTS */
-#financeTable .action-btn{white-space:nowrap}
-#reportTableBody td,#reportTableHead th{white-space:normal}
-.fin-positive{color:var(--green);font-weight:700}.fin-negative{color:var(--red);font-weight:700}
-@media print{body{background:#fff}.sidebar,.topbar,.section-actions,.filter-row,#financeForm,.modal-backdrop,.toast{display:none!important}.main{margin:0;width:100%}.content{padding:0;max-width:none}.section{display:none!important}.section.active{display:block!important}.panel,.stat-card{break-inside:avoid;border:1px solid #ddd;box-shadow:none}.table-wrap{overflow:visible}table{min-width:0}th,td{font-size:9px;padding:7px}}
-
-/* RESPONSIVE */
+/\* RESPONSIVE \*/
 @media(max-width:1050px){
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+&#x20; .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:700px){
-  .sidebar{transform:translateX(-100%)}
-  .sidebar.open{transform:translateX(0);box-shadow:10px 0 35px #0002}
-  .main{margin-left:0;width:100%}
-  .menu-toggle{display:block}
-  .topbar{padding:0 15px;height:62px}
-  .content{padding:22px 15px}
-  .welcome h2{font-size:20px}
-  .stats{gap:10px}
-  .stat-card{padding:14px}
-  .stat-value{font-size:22px}
-  .stat-label{font-size:11px}
-  .date-label{display:none}
-  .panel-header{padding:16px}
-  .panel-body{padding:13px}
-  .form-grid{grid-template-columns:1fr}
-  .form-group.full{grid-column:auto}
+&#x20; .sidebar{transform:translateX(-100%)}
+&#x20; .sidebar.open{transform:translateX(0);box-shadow:10px 0 35px #0002}
+&#x20; .main{margin-left:0;width:100%}
+&#x20; .menu-toggle{display:block}
+&#x20; .topbar{padding:0 15px;height:62px}
+&#x20; .content{padding:22px 15px}
+&#x20; .welcome h2{font-size:20px}
+&#x20; .stats{gap:10px}
+&#x20; .stat-card{padding:14px}
+&#x20; .stat-value{font-size:22px}
+&#x20; .stat-label{font-size:11px}
+&#x20; .date-label{display:none}
+&#x20; .panel-header{padding:16px}
+&#x20; .panel-body{padding:13px}
+&#x20; .form-grid{grid-template-columns:1fr}
+&#x20; .form-group.full{grid-column:auto}
 }
 @media(max-width:380px){
-  .stats{grid-template-columns:1fr}
-  .logout-btn{padding:8px;font-size:11px}
+&#x20; .stats{grid-template-columns:1fr}
+&#x20; .logout-btn{padding:8px;font-size:11px}
 }
-</style>
-</head>
+\</style>
+\</head>
 
-<body>
+\<body>
 
-<div id="loadingScreen">
-  <div class="loader-logo">ZW</div>
-  <div class="loader-ring"></div>
-  <div class="loader-text">Preparing your dashboard...</div>
-</div>
+\<div id="loadingScreen">
+&#x20; \<div class="loader-logo">ZW\</div>
+&#x20; \<div class="loader-ring">\</div>
+&#x20; \<div class="loader-text">Preparing your dashboard...\</div>
+\</div>
 
-<div class="app hidden" id="app">
+\<div class="app hidden" id="app">
 
-<aside class="sidebar" id="sidebar">
-  <div class="brand">
-    <div class="brand-name">Zomba Welfare<br>Management</div>
-    <div class="brand-sub">Together, we care.</div>
-  </div>
+\<aside class="sidebar" id="sidebar">
+&#x20; \<div class="brand">
+&#x20;   \<div class="brand-name">Zomba Welfare\<br>Management\</div>
+&#x20;   \<div class="brand-sub">Together, we care.\</div>
+&#x20; \</div>
 
-  <div class="admin-label">Administration</div>
+&#x20; \<div class="admin-label">Administration\</div>
 
-  <nav class="nav">
-    <button class="active" data-section="dashboard"><span class="nav-icon">▦</span> Dashboard</button>
-    <button data-section="members"><span class="nav-icon">♙</span> Member Management</button>
-    <button data-section="payments"><span class="nav-icon">⇄</span> Payment Verification</button>
-    <button data-section="contributions"><span class="nav-icon">◷</span> Contributions</button>
-    <button data-section="activities"><span class="nav-icon">♡</span> Welfare Activities</button>
-    <button data-section="finance"><span class="nav-icon">▤</span> Finance & Expenditure</button>
-    <button data-section="reports"><span class="nav-icon">▥</span> Reports & Analytics</button>
-    <button data-section="announcements"><span class="nav-icon">♢</span> Announcements</button>
-    <button data-section="settings"><span class="nav-icon">⚙</span> System Settings</button>
-  </nav>
+&#x20; \<nav class="nav">
+&#x20;   \<button class="active" data-section="dashboard">\<span class="nav-icon">▦\</span> Dashboard\</button>
+&#x20;   \<button data-section="members">\<span class="nav-icon">♙\</span> Member Management\</button>
+&#x20;   \<button data-section="payments">\<span class="nav-icon">⇄\</span> Payment Verification\</button>
+&#x20;   \<button data-section="contributions">\<span class="nav-icon">◷\</span> Contributions\</button>
+&#x20;   \<button data-section="activities">\<span class="nav-icon">♡\</span> Welfare Activities\</button>
+&#x20;   \<button data-section="finance">\<span class="nav-icon">▤\</span> Finance & Expenditure\</button>
+&#x20;   \<button data-section="reports">\<span class="nav-icon">▥\</span> Reports & Analytics\</button>
+&#x20;   \<button data-section="announcements">\<span class="nav-icon">♢\</span> Announcements\</button>
+&#x20;   \<button data-section="settings">\<span class="nav-icon">⚙\</span> System Settings\</button>
+&#x20; \</nav>
 
-  <div class="sidebar-bottom">
-    <div class="profile-mini">
-      <div class="avatar" id="adminAvatar">A</div>
-      <div>
-        <strong id="adminName">Administrator</strong>
-        <small>System Administrator</small>
-      </div>
-    </div>
-  </div>
-</aside>
+&#x20; \<div class="sidebar-bottom">
+&#x20;   \<div class="profile-mini">
+&#x20;     \<div class="avatar" id="adminAvatar">A\</div>
+&#x20;     \<div>
+&#x20;       \<strong id="adminName">Administrator\</strong>
+&#x20;       \<small>System Administrator\</small>
+&#x20;     \</div>
+&#x20;   \</div>
+&#x20; \</div>
+\</aside>
 
-<main class="main">
-<header class="topbar">
-  <div class="top-left">
-    <button class="menu-toggle" id="menuToggle">☰</button>
-    <div class="page-heading" id="pageHeading">Dashboard</div>
-  </div>
-  <div class="top-right">
-    <span class="date-label" id="todayDate"></span>
-    <button class="logout-btn" id="logoutButton">Sign out ↗</button>
-  </div>
-</header>
+\<main class="main">
+\<header class="topbar">
+&#x20; \<div class="top-left">
+&#x20;   \<button class="menu-toggle" id="menuToggle">☰\</button>
+&#x20;   \<div class="page-heading" id="pageHeading">Dashboard\</div>
+&#x20; \</div>
+&#x20; \<div class="top-right">
+&#x20;   \<span class="date-label" id="todayDate">\</span>
+&#x20;   \<button class="logout-btn" id="logoutButton">Sign out ↗\</button>
+&#x20; \</div>
+\</header>
 
-<div class="content">
+\<div class="content">
 
-<!-- DASHBOARD -->
-<section class="section active" id="section-dashboard">
-  <div class="welcome">
-    <h2>Welcome back, <span id="welcomeName">Administrator</span></h2>
-    <p>Here is an overview of your welfare management system.</p>
-  </div>
+\<!-- DASHBOARD -->
+\<section class="section active" id="section-dashboard">
+&#x20; \<div class="welcome">
+&#x20;   \<h2>Welcome back, \<span id="welcomeName">Administrator\</span>\</h2>
+&#x20;   \<p>Here is an overview of your welfare management system.\</p>
+&#x20; \</div>
 
-  <div class="stats">
-    <div class="stat-card">
-      <div class="stat-top"><span class="stat-label">Registered Members</span><span class="stat-icon">♙</span></div>
-      <div class="stat-value" id="memberCount">—</div>
-      <div class="stat-note">Active member accounts</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-top"><span class="stat-label">Pending Payments</span><span class="stat-icon">◷</span></div>
-      <div class="stat-value" id="pendingCount">—</div>
-      <div class="stat-note">Awaiting your verification</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-top"><span class="stat-label">Paid Obligations</span><span class="stat-icon">✓</span></div>
-      <div class="stat-value" id="paidCount">—</div>
-      <div class="stat-note">Fully settled contribution months</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-top"><span class="stat-label">Unpaid Obligations</span><span class="stat-icon">!</span></div>
-      <div class="stat-value" id="unpaidCount">—</div>
-      <div class="stat-note">Outstanding contribution months</div>
-    </div>
-  </div>
+&#x20; \<div class="stats">
+&#x20;   \<div class="stat-card">
+&#x20;     \<div class="stat-top">\<span class="stat-label">Registered Members\</span>\<span class="stat-icon">♙\</span>\</div>
+&#x20;     \<div class="stat-value" id="memberCount">—\</div>
+&#x20;     \<div class="stat-note">Active member accounts\</div>
+&#x20;   \</div>
+&#x20;   \<div class="stat-card">
+&#x20;     \<div class="stat-top">\<span class="stat-label">Pending Payments\</span>\<span class="stat-icon">◷\</span>\</div>
+&#x20;     \<div class="stat-value" id="pendingCount">—\</div>
+&#x20;     \<div class="stat-note">Awaiting your verification\</div>
+&#x20;   \</div>
+&#x20;   \<div class="stat-card">
+&#x20;     \<div class="stat-top">\<span class="stat-label">Paid Obligations\</span>\<span class="stat-icon">✓\</span>\</div>
+&#x20;     \<div class="stat-value" id="paidCount">—\</div>
+&#x20;     \<div class="stat-note">Fully settled contribution months\</div>
+&#x20;   \</div>
+&#x20;   \<div class="stat-card">
+&#x20;     \<div class="stat-top">\<span class="stat-label">Unpaid Obligations\</span>\<span class="stat-icon">!\</span>\</div>
+&#x20;     \<div class="stat-value" id="unpaidCount">—\</div>
+&#x20;     \<div class="stat-note">Outstanding contribution months\</div>
+&#x20;   \</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div><h3>Recent Payment Submissions</h3><p>Latest payments submitted by members</p></div>
-      <button class="action-btn view-btn" onclick="showSection('payments')">View all</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Member</th><th>Amount</th><th>Transaction ID</th><th>Month</th><th>Status</th></tr></thead>
-        <tbody id="recentPayments"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">
+&#x20;     \<div>\<h3>Recent Payment Submissions\</h3>\<p>Latest payments submitted by members\</p>\</div>
+&#x20;     \<button class="action-btn view-btn" onclick="showSection('payments')">View all\</button>
+&#x20;   \</div>
+&#x20;   \<div class="table-wrap">
+&#x20;     \<table>
+&#x20;       \<thead>\<tr>\<th>Member\</th>\<th>Amount\</th>\<th>Transaction ID\</th>\<th>Month\</th>\<th>Status\</th>\</tr>\</thead>
+&#x20;       \<tbody id="recentPayments">\<tr>\<td colspan="5" class="empty">Loading...\</td>\</tr>\</tbody>
+&#x20;     \</table>
+&#x20;   \</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header"><div><h3>System Overview</h3><p>Quick access to important administrative work</p></div></div>
-    <div class="panel-body section-actions">
-      <button class="action-btn view-btn" onclick="showSection('members')">Manage members</button>
-      <button class="action-btn view-btn" onclick="showSection('payments')">Verify payments</button>
-      <button class="action-btn view-btn" onclick="showSection('contributions')">View contributions</button>
-      <button class="action-btn view-btn" onclick="showSection('activities')">Welfare activities</button>
-      <button class="action-btn view-btn" onclick="showSection('reports')">View reports</button>
-    </div>
-  </div>
-</section>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">\<div>\<h3>System Overview\</h3>\<p>Quick access to important administrative work\</p>\</div>\</div>
+&#x20;   \<div class="panel-body section-actions">
+&#x20;     \<button class="action-btn view-btn" onclick="showSection('members')">Manage members\</button>
+&#x20;     \<button class="action-btn view-btn" onclick="showSection('payments')">Verify payments\</button>
+&#x20;     \<button class="action-btn view-btn" onclick="showSection('contributions')">View contributions\</button>
+&#x20;     \<button class="action-btn view-btn" onclick="showSection('activities')">Welfare activities\</button>
+&#x20;     \<button class="action-btn view-btn" onclick="showSection('reports')">View reports\</button>
+&#x20;   \</div>
+&#x20; \</div>
+\</section>
 
-<!-- MEMBERS -->
-<section class="section" id="section-members">
-  <div class="welcome"><h2>Member Management</h2><p>View registered welfare members.</p></div>
-  <div class="panel">
-    <div class="panel-header"><div><h3>Registered Members</h3><p>Member account directory</p></div></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Account Role</th></tr></thead>
-        <tbody id="membersTable"><tr><td colspan="4" class="empty">Loading members...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</section>
+\<!-- MEMBERS -->
+\<section class="section" id="section-members">
+&#x20; \<div class="welcome">\<h2>Member Management\</h2>\<p>View registered welfare members.\</p>\</div>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">\<div>\<h3>Registered Members\</h3>\<p>Member account directory\</p>\</div>\</div>
+&#x20;   \<div class="table-wrap">
+&#x20;     \<table>
+&#x20;       \<thead>\<tr>\<th>Name\</th>\<th>Email\</th>\<th>Phone\</th>\<th>Account Role\</th>\</tr>\</thead>
+&#x20;       \<tbody id="membersTable">\<tr>\<td colspan="4" class="empty">Loading members...\</td>\</tr>\</tbody>
+&#x20;     \</table>
+&#x20;   \</div>
+&#x20; \</div>
+\</section>
 
-<!-- PAYMENTS -->
-<section class="section" id="section-payments">
-  <div class="welcome">
-    <h2>Payment Verification</h2>
-    <p>Review member payment submissions and confirm receipt before allocation.</p>
-  </div>
-  <div class="panel">
-    <div class="panel-header">
-      <div><h3>Pending Submissions</h3><p>Payments requiring administrator action</p></div>
-      <button class="action-btn view-btn" onclick="loadPayments()">↻ Refresh</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Member</th><th>Amount</th><th>Transaction ID</th><th>Contribution Month</th><th>Date Submitted</th><th>Action</th></tr>
-        </thead>
-        <tbody id="paymentsTable"><tr><td colspan="6" class="empty">Loading submissions...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</section>
+\<!-- PAYMENTS -->
+\<section class="section" id="section-payments">
+&#x20; \<div class="welcome">
+&#x20;   \<h2>Payment Verification\</h2>
+&#x20;   \<p>Review member payment submissions and confirm receipt before allocation.\</p>
+&#x20; \</div>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">
+&#x20;     \<div>\<h3>Pending Submissions\</h3>\<p>Payments requiring administrator action\</p>\</div>
+&#x20;     \<button class="action-btn view-btn" onclick="loadPayments()">↻ Refresh\</button>
+&#x20;   \</div>
+&#x20;   \<div class="table-wrap">
+&#x20;     \<table>
+&#x20;       \<thead>
+&#x20;         \<tr>\<th>Member\</th>\<th>Amount\</th>\<th>Transaction ID\</th>\<th>Contribution Month\</th>\<th>Date Submitted\</th>\<th>Action\</th>\</tr>
+&#x20;       \</thead>
+&#x20;       \<tbody id="paymentsTable">\<tr>\<td colspan="6" class="empty">Loading submissions...\</td>\</tr>\</tbody>
+&#x20;     \</table>
+&#x20;   \</div>
+&#x20; \</div>
+\</section>
 
-<!-- CONTRIBUTIONS -->
-<section class="section" id="section-contributions">
-  <div class="welcome">
-    <h2>Contribution Management</h2>
-    <p>Monitor monthly contribution obligations, penalties, payment progress and wallet balances.</p>
-  </div>
+\<!-- CONTRIBUTIONS -->
+\<section class="section" id="section-contributions">
+&#x20; \<div class="welcome">
+&#x20;   \<h2>Contribution Management\</h2>
+&#x20;   \<p>Monitor monthly contribution obligations, penalties, payment progress and wallet balances.\</p>
+&#x20; \</div>
 
-  <div class="stats">
-    <div class="stat-card"><div class="stat-label">Expected Contributions</div><div class="stat-value" id="contributionExpected">MWK 0</div></div>
-    <div class="stat-card"><div class="stat-label">Collected</div><div class="stat-value" id="contributionCollected">MWK 0</div></div>
-    <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-value" id="contributionOutstanding">MWK 0</div></div>
-    <div class="stat-card"><div class="stat-label">Unallocated Wallet Credit</div><div class="stat-value" id="contributionWallet">MWK 0</div></div>
-  </div>
+&#x20; \<div class="stats">
+&#x20;   \<div class="stat-card">\<div class="stat-label">Expected Contributions\</div>\<div class="stat-value" id="contributionExpected">MWK 0\</div>\</div>
+&#x20;   \<div class="stat-card">\<div class="stat-label">Collected\</div>\<div class="stat-value" id="contributionCollected">MWK 0\</div>\</div>
+&#x20;   \<div class="stat-card">\<div class="stat-label">Outstanding\</div>\<div class="stat-value" id="contributionOutstanding">MWK 0\</div>\</div>
+&#x20;   \<div class="stat-card">\<div class="stat-label">Unallocated Wallet Credit\</div>\<div class="stat-value" id="contributionWallet">MWK 0\</div>\</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div><h3>Monthly Contribution Records</h3><p>Obligations, penalties and payment status by member</p></div>
-      <div class="section-actions">
-        <select id="contributionMonthFilter" class="filter-select">
-          <option value="all">All months</option>
-        </select>
-        <button class="action-btn view-btn" onclick="loadContributions()">↻ Refresh</button>
-      </div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Member</th><th>Month</th><th>Base</th><th>Penalty</th><th>Total Due</th><th>Paid</th><th>Outstanding</th><th>Status</th></tr>
-        </thead>
-        <tbody id="contributionTable"><tr><td colspan="8" class="empty">Open this module to load records.</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">
+&#x20;     \<div>\<h3>Monthly Contribution Records\</h3>\<p>Obligations, penalties and payment status by member\</p>\</div>
+&#x20;     \<div class="section-actions">
+&#x20;       \<select id="contributionMonthFilter" class="filter-select">
+&#x20;         \<option value="all">All months\</option>
+&#x20;       \</select>
+&#x20;       \<button class="action-btn view-btn" onclick="loadContributions()">↻ Refresh\</button>
+&#x20;     \</div>
+&#x20;   \</div>
+&#x20;   \<div class="table-wrap">
+&#x20;     \<table>
+&#x20;       \<thead>
+&#x20;         \<tr>\<th>Member\</th>\<th>Month\</th>\<th>Base\</th>\<th>Penalty\</th>\<th>Total Due\</th>\<th>Paid\</th>\<th>Outstanding\</th>\<th>Status\</th>\</tr>
+&#x20;       \</thead>
+&#x20;       \<tbody id="contributionTable">\<tr>\<td colspan="8" class="empty">Open this module to load records.\</td>\</tr>\</tbody>
+&#x20;     \</table>
+&#x20;   \</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div><h3>Member Wallet Balances</h3><p>Unallocated credit remaining after contribution allocation</p></div>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Member</th><th>Total Credits</th><th>Total Debits</th><th>Available Wallet Balance</th></tr></thead>
-        <tbody id="contributionWalletTable"><tr><td colspan="4" class="empty">Open this module to load wallet balances.</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</section>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">
+&#x20;     \<div>\<h3>Member Wallet Balances\</h3>\<p>Unallocated credit remaining after contribution allocation\</p>\</div>
+&#x20;   \</div>
+&#x20;   \<div class="table-wrap">
+&#x20;     \<table>
+&#x20;       \<thead>\<tr>\<th>Member\</th>\<th>Total Credits\</th>\<th>Total Debits\</th>\<th>Available Wallet Balance\</th>\</tr>\</thead>
+&#x20;       \<tbody id="contributionWalletTable">\<tr>\<td colspan="4" class="empty">Open this module to load wallet balances.\</td>\</tr>\</tbody>
+&#x20;     \</table>
+&#x20;   \</div>
+&#x20; \</div>
+\</section>
 
-<!-- WELFARE ACTIVITIES -->
-<section class="section" id="section-activities">
-  <div class="welcome">
-    <h2>Welfare Activities</h2>
-    <p>Manage welfare support, events, activities and related expenditure.</p>
-  </div>
+\<!-- WELFARE ACTIVITIES -->
+\<section class="section" id="section-activities">
+&#x20; \<div class="welcome">
+&#x20;   \<h2>Welfare Activities\</h2>
+&#x20;   \<p>Manage welfare support, events, activities and related expenditure.\</p>
+&#x20; \</div>
 
-  <div class="stats">
-    <div class="stat-card"><div class="stat-label">Total Activities</div><div class="stat-value" id="activityTotal">0</div></div>
-    <div class="stat-card"><div class="stat-label">Ongoing</div><div class="stat-value" id="activityOngoing">0</div></div>
-    <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" id="activityCompleted">0</div></div>
-    <div class="stat-card"><div class="stat-label">Total Expenditure</div><div class="stat-value" id="activityExpenditure">MWK 0</div></div>
-  </div>
+&#x20; \<div class="stats">
+&#x20;   \<div class="stat-card">\<div class="stat-label">Total Activities\</div>\<div class="stat-value" id="activityTotal">0\</div>\</div>
+&#x20;   \<div class="stat-card">\<div class="stat-label">Ongoing\</div>\<div class="stat-value" id="activityOngoing">0\</div>\</div>
+&#x20;   \<div class="stat-card">\<div class="stat-label">Completed\</div>\<div class="stat-value" id="activityCompleted">0\</div>\</div>
+&#x20;   \<div class="stat-card">\<div class="stat-label">Total Expenditure\</div>\<div class="stat-value" id="activityExpenditure">MWK 0\</div>\</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header"><div><h3>Create Welfare Activity</h3><p>Record a new welfare activity or support initiative</p></div></div>
-    <div class="panel-body">
-      <form id="activityForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="activityTitle">Activity title</label>
-            <input id="activityTitle" type="text" required placeholder="e.g. Hospital support">
-          </div>
-          <div class="form-group">
-            <label for="activityCategory">Activity category</label>
-            <select id="activityCategory" required>
-              <option value="">Select category</option>
-              <option value="Medical Support">Medical Support</option>
-              <option value="Bereavement Support">Bereavement Support</option>
-              <option value="Birthday Celebration">Birthday Celebration</option>
-              <option value="Wedding Support">Wedding Support</option>
-              <option value="Celebration">Celebration</option>
-              <option value="Social Gathering">Social Gathering</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-group full">
-            <label for="activityDescription">Description</label>
-            <textarea id="activityDescription" rows="3" placeholder="Describe the activity without including unnecessary private information"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="activityDate">Activity date</label>
-            <input id="activityDate" type="date">
-          </div>
-          <div class="form-group">
-            <label for="activityLocation">Location</label>
-            <input id="activityLocation" type="text" placeholder="Enter location">
-          </div>
-          <div class="form-group">
-            <label for="activityBudget">Approved budget (MWK)</label>
-            <input id="activityBudget" type="number" min="0" step="0.01" value="0">
-          </div>
-          <div class="form-group">
-            <label for="activityStatus">Activity status</label>
-            <select id="activityStatus" required>
-              <option value="draft">Draft — Admin only</option>
-              <option value="published">Published</option>
-              <option value="ongoing">Ongoing</option>
-              <option value="completed">Completed</option>
-              <option value="closed">Closed</option>
-            </select>
-          </div>
-        </div>
-        <button type="submit" class="action-btn primary-btn" id="saveActivityBtn">Save Activity</button>
-        <p id="activityFormMessage" class="form-message"></p>
-      </form>
-    </div>
-  </div>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">\<div>\<h3>Create Welfare Activity\</h3>\<p>Record a new welfare activity or support initiative\</p>\</div>\</div>
+&#x20;   \<div class="panel-body">
+&#x20;     \<form id="activityForm">
+&#x20;       \<div class="form-grid">
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="activityTitle">Activity title\</label>
+&#x20;           \<input id="activityTitle" type="text" required placeholder="e.g. Hospital support">
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="activityCategory">Activity category\</label>
+&#x20;           \<select id="activityCategory" required>
+&#x20;             \<option value="">Select category\</option>
+&#x20;             \<option value="Medical Support">Medical Support\</option>
+&#x20;             \<option value="Bereavement Support">Bereavement Support\</option>
+&#x20;             \<option value="Birthday Celebration">Birthday Celebration\</option>
+&#x20;             \<option value="Wedding Support">Wedding Support\</option>
+&#x20;             \<option value="Celebration">Celebration\</option>
+&#x20;             \<option value="Social Gathering">Social Gathering\</option>
+&#x20;             \<option value="Other">Other\</option>
+&#x20;           \</select>
+&#x20;         \</div>
+&#x20;         \<div class="form-group full">
+&#x20;           \<label for="activityDescription">Description\</label>
+&#x20;           \<textarea id="activityDescription" rows="3" placeholder="Describe the activity without including unnecessary private information">\</textarea>
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="activityDate">Activity date\</label>
+&#x20;           \<input id="activityDate" type="date">
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="activityLocation">Location\</label>
+&#x20;           \<input id="activityLocation" type="text" placeholder="Enter location">
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="activityBudget">Approved budget (MWK)\</label>
+&#x20;           \<input id="activityBudget" type="number" min="0" step="0.01" value="0">
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="activityStatus">Activity status\</label>
+&#x20;           \<select id="activityStatus" required>
+&#x20;             \<option value="draft">Draft — Admin only\</option>
+&#x20;             \<option value="published">Published\</option>
+&#x20;             \<option value="ongoing">Ongoing\</option>
+&#x20;             \<option value="completed">Completed\</option>
+&#x20;             \<option value="closed">Closed\</option>
+&#x20;           \</select>
+&#x20;         \</div>
+&#x20;       \</div>
+&#x20;       \<button type="submit" class="action-btn primary-btn" id="saveActivityBtn">Save Activity\</button>
+&#x20;       \<p id="activityFormMessage" class="form-message">\</p>
+&#x20;     \</form>
+&#x20;   \</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header">
-      <div><h3>Welfare Activities Records</h3><p>Activities recorded in the system</p></div>
-      <button class="action-btn view-btn" type="button" onclick="loadWelfareActivities()">↻ Refresh</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Activity</th><th>Category</th><th>Date</th><th>Budget</th><th>Status</th></tr></thead>
-        <tbody id="activitiesTableBody"><tr><td colspan="5" class="empty">Open this module to load activities.</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">
+&#x20;     \<div>\<h3>Welfare Activities Records\</h3>\<p>Activities recorded in the system\</p>\</div>
+&#x20;     \<button class="action-btn view-btn" type="button" onclick="loadWelfareActivities()">↻ Refresh\</button>
+&#x20;   \</div>
+&#x20;   \<div class="table-wrap">
+&#x20;     \<table>
+&#x20;       \<thead>\<tr>\<th>Activity\</th>\<th>Category\</th>\<th>Date\</th>\<th>Budget\</th>\<th>Status\</th>\</tr>\</thead>
+&#x20;       \<tbody id="activitiesTableBody">\<tr>\<td colspan="5" class="empty">Open this module to load activities.\</td>\</tr>\</tbody>
+&#x20;     \</table>
+&#x20;   \</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header"><div><h3>Record Activity Expenditure</h3><p>Record money spent on a welfare activity</p></div></div>
-    <div class="panel-body">
-      <form id="activityExpenseForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="expenseActivity">Select activity</label>
-            <select id="expenseActivity" required><option value="">Select an activity</option></select>
-          </div>
-          <div class="form-group">
-            <label for="expenseDescription">Expense description</label>
-            <input id="expenseDescription" type="text" required placeholder="e.g. Transport, food, medical assistance">
-          </div>
-          <div class="form-group">
-            <label for="expenseAmount">Amount (MWK)</label>
-            <input id="expenseAmount" type="number" min="0.01" step="0.01" required>
-          </div>
-          <div class="form-group">
-            <label for="expenseDate">Expense date</label>
-            <input id="expenseDate" type="date" required>
-          </div>
-          <div class="form-group">
-            <label for="expensePaidTo">Paid to</label>
-            <input id="expensePaidTo" type="text" placeholder="Person or organisation paid">
-          </div>
-          <div class="form-group">
-            <label for="expenseReceipt">Receipt/reference number</label>
-            <input id="expenseReceipt" type="text" placeholder="Optional receipt reference">
-          </div>
-        </div>
-        <button type="submit" class="action-btn primary-btn" id="saveExpenseBtn">Save Expenditure</button>
-        <p id="expenseFormMessage" class="form-message"></p>
-      </form>
-    </div>
-  </div>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">\<div>\<h3>Record Activity Expenditure\</h3>\<p>Record money spent on a welfare activity\</p>\</div>\</div>
+&#x20;   \<div class="panel-body">
+&#x20;     \<form id="activityExpenseForm">
+&#x20;       \<div class="form-grid">
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="expenseActivity">Select activity\</label>
+&#x20;           \<select id="expenseActivity" required>\<option value="">Select an activity\</option>\</select>
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="expenseDescription">Expense description\</label>
+&#x20;           \<input id="expenseDescription" type="text" required placeholder="e.g. Transport, food, medical assistance">
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="expenseAmount">Amount (MWK)\</label>
+&#x20;           \<input id="expenseAmount" type="number" min="0.01" step="0.01" required>
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="expenseDate">Expense date\</label>
+&#x20;           \<input id="expenseDate" type="date" required>
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="expensePaidTo">Paid to\</label>
+&#x20;           \<input id="expensePaidTo" type="text" placeholder="Person or organisation paid">
+&#x20;         \</div>
+&#x20;         \<div class="form-group">
+&#x20;           \<label for="expenseReceipt">Receipt/reference number\</label>
+&#x20;           \<input id="expenseReceipt" type="text" placeholder="Optional receipt reference">
+&#x20;         \</div>
+&#x20;       \</div>
+&#x20;       \<button type="submit" class="action-btn primary-btn" id="saveExpenseBtn">Save Expenditure\</button>
+&#x20;       \<p id="expenseFormMessage" class="form-message">\</p>
+&#x20;     \</form>
+&#x20;   \</div>
+&#x20; \</div>
 
-  <div class="panel">
-    <div class="panel-header"><div><h3>Expenditure Records</h3><p>Recorded spending against welfare activities</p></div></div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Date</th><th>Activity</th><th>Description</th><th>Paid to</th><th>Amount</th><th>Receipt</th></tr></thead>
-        <tbody id="activityExpensesBody"><tr><td colspan="6" class="empty">No expenditure records loaded.</td></tr></tbody>
-      </table>
-    </div>
-  </div>
-</section>
+&#x20; \<div class="panel">
+&#x20;   \<div class="panel-header">\<div>\<h3>Expenditure Records\</h3>\<p>Recorded spending against welfare activities\</p>\</div>\</div>
+&#x20;   \<div class="table-wrap">
+&#x20;     \<table>
+&#x20;       \<thead>\<tr>\<th>Date\</th>\<th>Activity\</th>\<th>Description\</th>\<th>Paid to\</th>\<th>Amount\</th>\<th>Receipt\</th>\</tr>\</thead>
+&#x20;       \<tbody id="activityExpensesBody">\<tr>\<td colspan="6" class="empty">No expenditure records loaded.\</td>\</tr>\</tbody>
+&#x20;     \</table>
+&#x20;   \</div>
+&#x20; \</div>
+\</section>
 
-<!-- FINANCE -->
-<section class="section" id="section-finance">
-  <div class="welcome"><h2>Finance & Expenditure</h2><p>Record income, track expenditure and monitor the welfare fund position.</p></div>
-  <div class="stats">
-    <div class="stat-card"><div class="stat-label">Verified Contributions</div><div class="stat-value" id="finVerified">MWK 0</div><div class="stat-note">Payments verified by the administrator</div></div>
-    <div class="stat-card"><div class="stat-label">Other Income</div><div class="stat-value" id="finIncome">MWK 0</div><div class="stat-note">Additional income recorded in the ledger</div></div>
-    <div class="stat-card"><div class="stat-label">Total Expenditure</div><div class="stat-value" id="finExpense">MWK 0</div><div class="stat-note">Expenditure recorded in the finance ledger</div></div>
-    <div class="stat-card"><div class="stat-label">Current Balance</div><div class="stat-value" id="finBalance">MWK 0</div><div class="stat-note">Verified contributions + other income − expenditure</div></div>
-  </div>
-  <div class="section-note">Use this ledger for official welfare fund income and expenditure. Activity-specific entries in Welfare Activities remain separate and are not automatically copied here, preventing accidental double counting. If an activity expense is also an official fund expense, record it here once.</div>
-  <div class="panel">
-    <div class="panel-header"><div><h3 id="financeFormTitle">Record a Financial Transaction</h3><p>Add other income or record an authorised expenditure.</p></div></div>
-    <div class="panel-body">
-      <form id="financeForm">
-        <input type="hidden" id="financeRecordId">
-        <div class="form-grid">
-          <div class="form-group"><label for="financeType">Transaction type</label><select id="financeType" required><option value="income">Other income</option><option value="expenditure">Expenditure</option></select></div>
-          <div class="form-group"><label for="financeDate">Transaction date</label><input id="financeDate" type="date" required></div>
-          <div class="form-group"><label for="financeCategory">Category</label><select id="financeCategory" required><option value="">Select category</option></select></div>
-          <div class="form-group"><label for="financeAmount">Amount (MWK)</label><input id="financeAmount" type="number" min="0.01" step="0.01" required></div>
-          <div class="form-group"><label for="financeParty">Received from / Paid to</label><input id="financeParty" type="text" placeholder="Person or organisation"></div>
-          <div class="form-group"><label for="financeAuthorised">Authorised by</label><input id="financeAuthorised" type="text" placeholder="Name of authorising person"></div>
-          <div class="form-group full"><label for="financeDescription">Description</label><textarea id="financeDescription" required placeholder="Explain the transaction"></textarea></div>
-          <div class="form-group full"><label for="financeReceipt">Receipt / supporting document reference (optional)</label><input id="financeReceipt" type="text" placeholder="Receipt number or document URL"></div>
-        </div>
-        <div class="section-actions"><button type="submit" class="action-btn primary-btn" id="saveFinanceBtn">Save Transaction</button><button type="button" class="action-btn view-btn hidden" id="cancelFinanceEdit">Cancel edit</button></div>
-        <p id="financeFormMessage" class="form-message"></p>
-      </form>
-    </div>
-  </div>
-  <div class="panel">
-    <div class="panel-header"><div><h3>Financial Transaction History</h3><p>Income and expenditure entered in the official ledger.</p></div><div class="section-actions"><button class="action-btn view-btn" onclick="loadFinance()">↻ Refresh</button><button class="action-btn view-btn" onclick="printFinanceStatement()">Print statement</button></div></div>
-    <div class="panel-body"><div class="filter-row">
-      <label for="financeTypeFilter">Type</label><select id="financeTypeFilter" class="filter-select"><option value="all">All transactions</option><option value="income">Income</option><option value="expenditure">Expenditure</option></select>
-      <label for="financeCategoryFilter">Category</label><select id="financeCategoryFilter" class="filter-select"><option value="all">All categories</option></select>
-      <label for="financeFrom">From</label><input class="filter-select" type="date" id="financeFrom">
-      <label for="financeTo">To</label><input class="filter-select" type="date" id="financeTo">
-      <button class="action-btn view-btn" onclick="renderFinanceHistory()">Apply</button><button class="action-btn view-btn" onclick="clearFinanceFilters()">Clear</button>
-    </div></div>
-    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Party</th><th>Amount</th><th>Receipt / Reference</th><th>Actions</th></tr></thead><tbody id="financeTable"><tr><td colspan="8" class="empty">Open this module to load financial records.</td></tr></tbody></table></div>
-  </div>
-</section>
+\<!-- FINANCE -->
+\<section class="section" id="section-finance">
+&#x20; \<div class="welcome">\<h2>Finance & Expenditure\</h2>\<p>Maintain transparent records of welfare funds and expenditure.\</p>\</div>
+&#x20; \<div class="module-placeholder">
+&#x20;   \<div class="big-icon">▤\</div>\<h3>Finance & Expenditure\</h3>
+&#x20;   \<p>This module will manage income, expenditure, receipts, financial balances and audit records.\</p>
+&#x20; \</div>
+\</section>
 
-<!-- REPORTS -->
-<section class="section" id="section-reports">
-  <div class="welcome"><h2>Reports & Analytics</h2><p>Generate contribution, payment, member, activity and financial reports for the welfare group.</p></div>
-  <div class="panel">
-    <div class="panel-header"><div><h3>Report Builder</h3><p>Select a report and apply date or member filters.</p></div></div>
-    <div class="panel-body"><div class="form-grid">
-      <div class="form-group"><label for="reportType">Report category</label><select id="reportType"><option value="contributions">Contributions Report</option><option value="payments">Payment Report</option><option value="members">Member Performance Report</option><option value="activities">Welfare Activities Report</option><option value="financial">Financial Report</option><option value="monthly">Monthly Summary Report</option><option value="annual">Annual Summary Report</option></select></div>
-      <div class="form-group"><label for="reportMember">Member</label><select id="reportMember"><option value="all">All members</option></select></div>
-      <div class="form-group"><label for="reportFrom">Start date</label><input id="reportFrom" type="date"></div>
-      <div class="form-group"><label for="reportTo">End date</label><input id="reportTo" type="date"></div>
-    </div><div class="section-actions"><button class="action-btn primary-btn" id="generateReportBtn" type="button" onclick="generateReport()">Generate report</button><button class="action-btn view-btn" type="button" onclick="exportReportCSV()">Export CSV</button><button class="action-btn view-btn" type="button" onclick="printReport()">Print report</button></div><p id="reportMessage" class="form-message"></p></div>
-  </div>
-  <div class="stats">
-    <div class="stat-card"><div class="stat-label">Records in Report</div><div class="stat-value" id="reportRecordCount">—</div></div>
-    <div class="stat-card"><div class="stat-label">Total Amount / Value</div><div class="stat-value" id="reportTotal">MWK 0</div></div>
-    <div class="stat-card"><div class="stat-label">Report Period</div><div class="stat-value" id="reportPeriod" style="font-size:16px">All dates</div></div>
-    <div class="stat-card"><div class="stat-label">Generated</div><div class="stat-value" id="reportGenerated" style="font-size:16px">—</div></div>
-  </div>
-  <div class="panel"><div class="panel-header"><div><h3 id="reportTableTitle">Report results</h3><p id="reportTableDescription">Generate a report to view records.</p></div></div><div class="table-wrap"><table><thead id="reportTableHead"><tr><th>Report</th></tr></thead><tbody id="reportTableBody"><tr><td class="empty">Select a report and generate it to view results.</td></tr></tbody></table></div></div>
-</section>
+\<!-- REPORTS -->
+\<section class="section" id="section-reports">
+&#x20; \<div class="welcome">\<h2>Reports & Analytics\</h2>\<p>Review welfare contribution and financial performance.\</p>\</div>
+&#x20; \<div class="module-placeholder">
+&#x20;   \<div class="big-icon">▥\</div>\<h3>Reports & Analytics\</h3>
+&#x20;   \<p>This module will provide contribution summaries, member statements, payment reports and downloadable financial reports.\</p>
+&#x20; \</div>
+\</section>
 
-<!-- ANNOUNCEMENTS -->
-<section class="section" id="section-announcements">
-  <div class="welcome"><h2>Announcements</h2><p>Communicate important information to welfare members.</p></div>
-  <div class="module-placeholder">
-    <div class="big-icon">♢</div><h3>Announcements & Notifications</h3>
-    <p>This module will allow the administrator to publish notices and send updates to members.</p>
-  </div>
-</section>
+\<!-- ANNOUNCEMENTS -->
+\<section class="section" id="section-announcements">
+&#x20; \<div class="welcome">\<h2>Announcements\</h2>\<p>Communicate important information to welfare members.\</p>\</div>
+&#x20; \<div class="module-placeholder">
+&#x20;   \<div class="big-icon">♢\</div>\<h3>Announcements & Notifications\</h3>
+&#x20;   \<p>This module will allow the administrator to publish notices and send updates to members.\</p>
+&#x20; \</div>
+\</section>
 
-<!-- SETTINGS -->
-<section class="section" id="section-settings">
-  <div class="welcome"><h2>System Settings</h2><p>Manage important welfare system configurations.</p></div>
-  <div class="module-placeholder">
-    <div class="big-icon">⚙</div><h3>System Settings</h3>
-    <p>This module will manage contribution settings, official receiving accounts and other system configurations.</p>
-  </div>
-</section>
+\<!-- SETTINGS -->
+\<section class="section" id="section-settings">
+&#x20; \<div class="welcome">\<h2>System Settings\</h2>\<p>Manage important welfare system configurations.\</p>\</div>
+&#x20; \<div class="module-placeholder">
+&#x20;   \<div class="big-icon">⚙\</div>\<h3>System Settings\</h3>
+&#x20;   \<p>This module will manage contribution settings, official receiving accounts and other system configurations.\</p>
+&#x20; \</div>
+\</section>
 
-</div>
-</main>
-</div>
+\</div>
+\</main>
+\</div>
 
-<!-- REJECTION MODAL -->
-<div class="modal-backdrop" id="rejectModal">
-  <div class="modal">
-    <h3>Reject Payment Submission</h3>
-    <p>Please provide a reason for rejecting this payment. The member will be able to see the reason.</p>
-    <textarea id="rejectionReason" placeholder="Enter rejection reason..."></textarea>
-    <div class="modal-actions">
-      <button class="cancel-btn" onclick="closeRejectModal()">Cancel</button>
-      <button class="confirm-reject" id="confirmRejectButton">Reject Payment</button>
-    </div>
-  </div>
-</div>
+\<!-- REJECTION MODAL -->
+\<div class="modal-backdrop" id="rejectModal">
+&#x20; \<div class="modal">
+&#x20;   \<h3>Reject Payment Submission\</h3>
+&#x20;   \<p>Please provide a reason for rejecting this payment. The member will be able to see the reason.\</p>
+&#x20;   \<textarea id="rejectionReason" placeholder="Enter rejection reason...">\</textarea>
+&#x20;   \<div class="modal-actions">
+&#x20;     \<button class="cancel-btn" onclick="closeRejectModal()">Cancel\</button>
+&#x20;     \<button class="confirm-reject" id="confirmRejectButton">Reject Payment\</button>
+&#x20;   \</div>
+&#x20; \</div>
+\</div>
 
-<div class="toast" id="toast"></div>
+\<div class="toast" id="toast">\</div>
 
-<script>
-const SUPABASE_URL = "https://emmdhxlcqbvpvpjsmshz.supabase.co";
+\<script>
+const SUPABASE_URL = "[https://emmdhxlcqbvpvpjsmshz.supabase.co](https://emmdhxlcqbvpvpjsmshz.supabase.co)";
 const SUPABASE_KEY = "sb_publishable_Lu_e6XN9ZeXfQCPP5VkXqQ_jY6ceXzm";
 
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window\.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let pendingRejectId = null;
@@ -729,949 +675,805 @@ let activityCache = [];
 const $ = id => document.getElementById(id);
 
 function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[char]);
+&#x20; return String(value ?? "").replace(/[&<>"']/g, char => ({
+&#x20;   "&":"\&amp;","<":"\&lt;",">":"\&gt;",'"':"\&quot;","'":"\&#39;"
+&#x20; })[char]);
 }
 
 function formatMoney(value) {
-  return "MWK " + Number(value || 0).toLocaleString("en-US",{
-    minimumFractionDigits:0,maximumFractionDigits:2
-  });
+&#x20; return "MWK " + Number(value || 0).toLocaleString("en-US",{
+&#x20;   minimumFractionDigits:0,maximumFractionDigits:2
+&#x20; });
 }
 
 function formatDate(value) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return escapeHTML(value);
-  return date.toLocaleDateString("en-GB",{
-    day:"2-digit",month:"short",year:"numeric"
-  });
+&#x20; if (!value) return "—";
+&#x20; const date = new Date(value);
+&#x20; if (Number.isNaN(date.getTime())) return escapeHTML(value);
+&#x20; return date.toLocaleDateString("en-GB",{
+&#x20;   day:"2-digit",month:"short",year:"numeric"
+&#x20; });
 }
 
 function formatMonth(value) {
-  if (!value) return "—";
-  const date = new Date(String(value).slice(0,10) + "T00:00:00");
-  if (Number.isNaN(date.getTime())) return escapeHTML(value);
-  return date.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
+&#x20; if (!value) return "—";
+&#x20; const date = new Date(String(value).slice(0,10) + "T00:00:00");
+&#x20; if (Number.isNaN(date.getTime())) return escapeHTML(value);
+&#x20; return date.toLocaleDateString("en-GB",{month:"long",year:"numeric"});
 }
 
 function showToast(message) {
-  const toast = $("toast");
-  toast.textContent = message;
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"),3500);
+&#x20; const toast = $("toast");
+&#x20; toast.textContent = message;
+&#x20; toast.classList.add("show");
+&#x20; setTimeout(() => toast.classList.remove("show"),3500);
 }
 
 function setLoading(show) {
-  $("loadingScreen").classList.toggle("hidden",!show);
-  $("app").classList.toggle("hidden",show);
+&#x20; $("loadingScreen").classList.toggle("hidden",!show);
+&#x20; $("app").classList.toggle("hidden",show);
 }
 
-/* AUTHENTICATION */
+/\* AUTHENTICATION \*/
 async function initialise() {
-  try {
-    const {data,error} = await db.auth.getSession();
-    if (error) throw error;
+&#x20; try {
+&#x20;   const {data,error} = await db.auth.getSession();
+&#x20;   if (error) throw error;
 
-    if (!data.session) {
-      window.location.replace("index.html");
-      return;
-    }
+&#x20;   if (!data.session) {
+&#x20;     window\.location.replace("index.html");
+&#x20;     return;
+&#x20;   }
 
-    currentUser = data.session.user;
+&#x20;   currentUser = data.session.user;
 
-    const {data:roleData,error:roleError} = await db
-      .from("user_roles").select("role")
-      .eq("user_id",currentUser.id).maybeSingle();
+&#x20;   const {data:roleData,error:roleError} = await db
+&#x20;     .from("user_roles").select("role")
+&#x20;     .eq("user_id",currentUser.id).maybeSingle();
 
-    if (roleError) throw roleError;
+&#x20;   if (roleError) throw roleError;
 
-    if (!roleData || roleData.role !== "administrator") {
-      await db.auth.signOut();
-      window.location.replace("index.html");
-      return;
-    }
+&#x20;   if (!roleData || roleData.role !== "administrator") {
+&#x20;     await db.auth.signOut();
+&#x20;     window\.location.replace("index.html");
+&#x20;     return;
+&#x20;   }
 
-    const {data:profile} = await db.from("profiles")
-      .select("full_name").eq("id",currentUser.id).maybeSingle();
+&#x20;   const {data:profile} = await db.from("profiles")
+&#x20;     .select("full_name").eq("id",currentUser.id).maybeSingle();
 
-    const name = profile?.full_name || "Administrator";
-    $("adminName").textContent = name;
-    $("welcomeName").textContent = name.split(" ")[0];
-    $("adminAvatar").textContent = name.charAt(0).toUpperCase();
-    $("todayDate").textContent = new Date().toLocaleDateString("en-GB",{
-      weekday:"short",day:"numeric",month:"short",year:"numeric"
-    });
+&#x20;   const name = profile?.full_name || "Administrator";
+&#x20;   $("adminName").textContent = name;
+&#x20;   $("welcomeName").textContent = name.split(" ")[0];
+&#x20;   $("adminAvatar").textContent = name.charAt(0).toUpperCase();
+&#x20;   $("todayDate").textContent = new Date().toLocaleDateString("en-GB",{
+&#x20;     weekday:"short",day:"numeric",month:"short",year:"numeric"
+&#x20;   });
 
-    setLoading(false);
-    await loadDashboard();
+&#x20;   setLoading(false);
+&#x20;   await loadDashboard();
 
-  } catch(error) {
-    console.error(error);
-    showToast(error.message || "Unable to open administrator dashboard.");
-    setLoading(false);
-  }
+&#x20; } catch(error) {
+&#x20;   console.error(error);
+&#x20;   showToast(error.message || "Unable to open administrator dashboard.");
+&#x20;   setLoading(false);
+&#x20; }
 }
 
-/* NAVIGATION */
+/\* NAVIGATION \*/
 function showSection(section) {
-  document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
-  const target = $("section-" + section);
-  if (target) target.classList.add("active");
+&#x20; document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
+&#x20; const target = $("section-" + section);
+&#x20; if (target) target.classList.add("active");
 
-  document.querySelectorAll(".nav button").forEach(button => {
-    button.classList.toggle("active",button.dataset.section === section);
-  });
+&#x20; document.querySelectorAll(".nav button").forEach(button => {
+&#x20;   button.classList.toggle("active",button.dataset.section === section);
+&#x20; });
 
-  const activeButton = document.querySelector(`.nav button[data-section="${section}"]`);
-  $("pageHeading").textContent = activeButton ? activeButton.textContent.trim() : "Dashboard";
-  $("sidebar").classList.remove("open");
+&#x20; const activeButton = document.querySelector(\`.nav button[data-section="${section}"]\`);
+&#x20; $("pageHeading").textContent = activeButton ? activeButton.textContent.trim() : "Dashboard";
+&#x20; $("sidebar").classList.remove("open");
 
-  if (section === "members") loadMembers();
-  if (section === "payments") loadPayments();
-  if (section === "contributions") loadContributions();
-  if (section === "activities") loadWelfareActivities();
-  if (section === "finance") loadFinance();
-  if (section === "reports") loadReportMembers();
+&#x20; if (section === "members") loadMembers();
+&#x20; if (section === "payments") loadPayments();
+&#x20; if (section === "contributions") loadContributions();
+&#x20; if (section === "activities") loadWelfareActivities();
 }
 
 document.querySelectorAll(".nav button").forEach(button => {
-  button.addEventListener("click",() => showSection(button.dataset.section));
+&#x20; button.addEventListener("click",() => showSection(button.dataset.section));
 });
 
 $("menuToggle").addEventListener("click",() => {
-  $("sidebar").classList.toggle("open");
+&#x20; $("sidebar").classList.toggle("open");
 });
 
-/* DASHBOARD */
+/\* DASHBOARD \*/
 async function getCount(table,filters = []) {
-  let query = db.from(table).select("*",{count:"exact",head:true});
-  filters.forEach(([column,value]) => query = query.eq(column,value));
-  const {count,error} = await query;
-  if (error) {
-    console.error("Count error:",table,error);
-    return null;
-  }
-  return count ?? 0;
+&#x20; let query = db.from(table).select("\*",{count:"exact",head:true});
+&#x20; filters.forEach(([column,value]) => query = query.eq(column,value));
+&#x20; const {count,error} = await query;
+&#x20; if (error) {
+&#x20;   console.error("Count error:",table,error);
+&#x20;   return null;
+&#x20; }
+&#x20; return count ?? 0;
 }
 
 async function loadDashboard() {
-  const [members,pending,paid,unpaid] = await Promise.all([
-    getCount("profiles"),
-    getCount("payment_submissions",[["status","pending"]]),
-    getCount("contribution_obligations",[["status","paid"]]),
-    getCount("contribution_obligations",[["status","unpaid"]])
-  ]);
+&#x20; const [members,pending,paid,unpaid] = await Promise.all([
+&#x20;   getCount("profiles"),
+&#x20;   getCount("payment_submissions",[["status","pending"]]),
+&#x20;   getCount("contribution_obligations",[["status","paid"]]),
+&#x20;   getCount("contribution_obligations",[["status","unpaid"]])
+&#x20; ]);
 
-  $("memberCount").textContent = members === null ? "—" : members;
-  $("pendingCount").textContent = pending === null ? "—" : pending;
-  $("paidCount").textContent = paid === null ? "—" : paid;
-  $("unpaidCount").textContent = unpaid === null ? "—" : unpaid;
+&#x20; $("memberCount").textContent = members === null ? "—" : members;
+&#x20; $("pendingCount").textContent = pending === null ? "—" : pending;
+&#x20; $("paidCount").textContent = paid === null ? "—" : paid;
+&#x20; $("unpaidCount").textContent = unpaid === null ? "—" : unpaid;
 
-  await loadRecentPayments();
+&#x20; await loadRecentPayments();
 }
 
-/* MEMBERS */
+/\* MEMBERS \*/
 async function loadMembers() {
-  $("membersTable").innerHTML =
-    '<tr><td colspan="4" class="empty">Loading members...</td></tr>';
+&#x20; $("membersTable").innerHTML =
+&#x20;   '\<tr>\<td colspan="4" class="empty">Loading members...\</td>\</tr>';
 
-  const {data:profiles,error} = await db.from("profiles")
-    .select("id,full_name,email,phone_number").order("full_name");
+&#x20; const {data:profiles,error} = await db.from("profiles")
+&#x20;   .select("id,full_name,email,phone_number").order("full_name");
 
-  if (error) {
-    console.error(error);
-    $("membersTable").innerHTML =
-      '<tr><td colspan="4" class="empty">Unable to load members. Check database permissions.</td></tr>';
-    return;
-  }
+&#x20; if (error) {
+&#x20;   console.error(error);
+&#x20;   $("membersTable").innerHTML =
+&#x20;     '\<tr>\<td colspan="4" class="empty">Unable to load members. Check database permissions.\</td>\</tr>';
+&#x20;   return;
+&#x20; }
 
-  const {data:roles,error:roleError} = await db.from("user_roles")
-    .select("user_id,role");
+&#x20; const {data:roles,error:roleError} = await db.from("user_roles")
+&#x20;   .select("user_id,role");
 
-  if (roleError) console.error(roleError);
+&#x20; if (roleError) console.error(roleError);
 
-  const roleMap = {};
-  (roles || []).forEach(r => roleMap[r.user_id] = r.role);
-  const members = (profiles || []).filter(p => roleMap[p.id] === "member");
+&#x20; const roleMap = {};
+&#x20; (roles || []).forEach(r => roleMap[r.user_id] = r.role);
+&#x20; const members = (profiles || []).filter(p => roleMap[p.id] === "member");
 
-  if (!members.length) {
-    $("membersTable").innerHTML =
-      '<tr><td colspan="4" class="empty">No registered members found.</td></tr>';
-    return;
-  }
+&#x20; if (!members.length) {
+&#x20;   $("membersTable").innerHTML =
+&#x20;     '\<tr>\<td colspan="4" class="empty">No registered members found.\</td>\</tr>';
+&#x20;   return;
+&#x20; }
 
-  $("membersTable").innerHTML = members.map(member => `
-    <tr>
-      <td><strong>${escapeHTML(member.full_name || "Unnamed member")}</strong></td>
-      <td>${escapeHTML(member.email || "—")}</td>
-      <td>${escapeHTML(member.phone_number || "—")}</td>
-      <td><span class="status verified">Member</span></td>
-    </tr>
-  `).join("");
+&#x20; $("membersTable").innerHTML = members.map(member => \`
+&#x20;   \<tr>
+&#x20;     \<td>\<strong>${escapeHTML(member.full_name || "Unnamed member")}\</strong>\</td>
+&#x20;     \<td>${escapeHTML(member.email || "—")}\</td>
+&#x20;     \<td>${escapeHTML(member.phone_number || "—")}\</td>
+&#x20;     \<td>\<span class="status verified">Member\</span>\</td>
+&#x20;   \</tr>
+&#x20; \`).join("");
 }
 
-/* PAYMENTS */
+/\* PAYMENTS \*/
 async function fetchPayments(status = null) {
-  let query = db.from("payment_submissions")
-    .select("*").order("created_at",{ascending:false}).limit(100);
+&#x20; let query = db.from("payment_submissions")
+&#x20;   .select("\*").order("created_at",{ascending:false}).limit(100);
 
-  if (status) query = query.eq("status",status);
-  const {data,error} = await query;
-  if (error) throw error;
-  return data || [];
+&#x20; if (status) query = query.eq("status",status);
+&#x20; const {data,error} = await query;
+&#x20; if (error) throw error;
+&#x20; return data || [];
 }
 
 async function fetchMemberNames(rows) {
-  const ids = [...new Set(rows.map(row => row.member_id).filter(Boolean))];
-  if (!ids.length) return {};
+&#x20; const ids = [...new Set(rows.map(row => row\.member_id).filter(Boolean))];
+&#x20; if (!ids.length) return {};
 
-  const {data,error} = await db.from("profiles")
-    .select("id,full_name").in("id",ids);
+&#x20; const {data,error} = await db.from("profiles")
+&#x20;   .select("id,full_name").in("id",ids);
 
-  if (error) {
-    console.error(error);
-    return {};
-  }
+&#x20; if (error) {
+&#x20;   console.error(error);
+&#x20;   return {};
+&#x20; }
 
-  const names = {};
-  (data || []).forEach(p => names[p.id] = p.full_name || "Member");
-  return names;
+&#x20; const names = {};
+&#x20; (data || []).forEach(p => names[p.id] = p.full_name || "Member");
+&#x20; return names;
 }
 
 function getPaymentAmount(row) {
-  return row.amount ?? row.payment_amount ?? row.transaction_amount ?? 0;
+&#x20; return row\.amount ?? row\.payment_amount ?? row\.transaction_amount ?? 0;
 }
 
 function getTransactionId(row) {
-  return row.transaction_id ?? row.transaction_reference ?? row.reference ?? "—";
+&#x20; return row\.transaction_id ?? row\.transaction_reference ?? row\.reference ?? "—";
 }
 
 function paymentStatusBadge(status) {
-  const safe = String(status || "pending").toLowerCase();
-  const css = ["verified","rejected"].includes(safe) ? safe : "";
-  return `<span class="status ${css}">${escapeHTML(safe)}</span>`;
+&#x20; const safe = String(status || "pending").toLowerCase();
+&#x20; const css = ["verified","rejected"].includes(safe) ? safe : "";
+&#x20; return \`\<span class="status ${css}">${escapeHTML(safe)}\</span>\`;
 }
 
 async function getObligationMonthMap(rows) {
-  const ids = [...new Set(rows.map(row => row.selected_obligation_id).filter(Boolean))];
-  if (!ids.length) return {};
+&#x20; const ids = [...new Set(rows.map(row => row\.selected_obligation_id).filter(Boolean))];
+&#x20; if (!ids.length) return {};
 
-  const {data,error} = await db.from("contribution_obligations")
-    .select("id,contribution_month").in("id",ids);
+&#x20; const {data,error} = await db.from("contribution_obligations")
+&#x20;   .select("id,contribution_month").in("id",ids);
 
-  if (error) {
-    console.error(error);
-    return {};
-  }
+&#x20; if (error) {
+&#x20;   console.error(error);
+&#x20;   return {};
+&#x20; }
 
-  const map = {};
-  (data || []).forEach(item => map[item.id] = item.contribution_month);
-  return map;
+&#x20; const map = {};
+&#x20; (data || []).forEach(item => map[item.id] = item.contribution_month);
+&#x20; return map;
 }
 
 async function loadRecentPayments() {
-  const body = $("recentPayments");
-  body.innerHTML = '<tr><td colspan="5" class="empty">Loading recent submissions...</td></tr>';
+&#x20; const body = $("recentPayments");
+&#x20; body.innerHTML = '\<tr>\<td colspan="5" class="empty">Loading recent submissions...\</td>\</tr>';
 
-  try {
-    const rows = await fetchPayments();
-    const names = await fetchMemberNames(rows);
-    const months = await getObligationMonthMap(rows);
-    paymentCache = rows;
+&#x20; try {
+&#x20;   const rows = await fetchPayments();
+&#x20;   const names = await fetchMemberNames(rows);
+&#x20;   const months = await getObligationMonthMap(rows);
+&#x20;   paymentCache = rows;
 
-    if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="5" class="empty">No payment submissions yet.</td></tr>';
-      return;
-    }
+&#x20;   if (!rows.length) {
+&#x20;     body.innerHTML = '\<tr>\<td colspan="5" class="empty">No payment submissions yet.\</td>\</tr>';
+&#x20;     return;
+&#x20;   }
 
-    body.innerHTML = rows.slice(0,8).map(row => `
-      <tr>
-        <td>${escapeHTML(names[row.member_id] || "Member")}</td>
-        <td>${formatMoney(getPaymentAmount(row))}</td>
-        <td>${escapeHTML(getTransactionId(row))}</td>
-        <td>${formatMonth(months[row.selected_obligation_id])}</td>
-        <td>${paymentStatusBadge(row.status)}</td>
-      </tr>
-    `).join("");
+&#x20;   body.innerHTML = rows.slice(0,8).map(row => \`
+&#x20;     \<tr>
+&#x20;       \<td>${escapeHTML(names[row\.member_id] || "Member")}\</td>
+&#x20;       \<td>${formatMoney(getPaymentAmount(row))}\</td>
+&#x20;       \<td>${escapeHTML(getTransactionId(row))}\</td>
+&#x20;       \<td>${formatMonth(months[row\.selected_obligation_id])}\</td>
+&#x20;       \<td>${paymentStatusBadge(row\.status)}\</td>
+&#x20;     \</tr>
+&#x20;   \`).join("");
 
-  } catch(error) {
-    console.error(error);
-    body.innerHTML = '<tr><td colspan="5" class="empty">Unable to load payment records.</td></tr>';
-  }
+&#x20; } catch(error) {
+&#x20;   console.error(error);
+&#x20;   body.innerHTML = '\<tr>\<td colspan="5" class="empty">Unable to load payment records.\</td>\</tr>';
+&#x20; }
 }
 
 async function loadPayments() {
-  const body = $("paymentsTable");
-  body.innerHTML = '<tr><td colspan="6" class="empty">Loading payment submissions...</td></tr>';
+&#x20; const body = $("paymentsTable");
+&#x20; body.innerHTML = '\<tr>\<td colspan="6" class="empty">Loading payment submissions...\</td>\</tr>';
 
-  try {
-    const rows = await fetchPayments("pending");
-    const names = await fetchMemberNames(rows);
-    const months = await getObligationMonthMap(rows);
-    paymentCache = rows;
-    memberCache = names;
+&#x20; try {
+&#x20;   const rows = await fetchPayments("pending");
+&#x20;   const names = await fetchMemberNames(rows);
+&#x20;   const months = await getObligationMonthMap(rows);
+&#x20;   paymentCache = rows;
+&#x20;   memberCache = names;
 
-    if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="6" class="empty"><div class="empty-icon">✓</div>No pending payments. You are all caught up!</td></tr>';
-      return;
-    }
+&#x20;   if (!rows.length) {
+&#x20;     body.innerHTML = '\<tr>\<td colspan="6" class="empty">\<div class="empty-icon">✓\</div>No pending payments. You are all caught up!\</td>\</tr>';
+&#x20;     return;
+&#x20;   }
 
-    body.innerHTML = rows.map(row => `
-      <tr>
-        <td><strong>${escapeHTML(names[row.member_id] || "Member")}</strong></td>
-        <td>${formatMoney(getPaymentAmount(row))}</td>
-        <td>${escapeHTML(getTransactionId(row))}</td>
-        <td>${formatMonth(months[row.selected_obligation_id])}</td>
-        <td>${formatDate(row.created_at)}</td>
-        <td>
-          <button class="action-btn view-btn" onclick="viewPayment('${row.id}')">View</button>
-          <button class="action-btn verify-btn" onclick="verifyPayment('${row.id}')">Verify</button>
-          <button class="action-btn reject-btn" onclick="openRejectModal('${row.id}')">Reject</button>
-        </td>
-      </tr>
-    `).join("");
+&#x20;   body.innerHTML = rows.map(row => \`
+&#x20;     \<tr>
+&#x20;       \<td>\<strong>${escapeHTML(names[row\.member_id] || "Member")}\</strong>\</td>
+&#x20;       \<td>${formatMoney(getPaymentAmount(row))}\</td>
+&#x20;       \<td>${escapeHTML(getTransactionId(row))}\</td>
+&#x20;       \<td>${formatMonth(months[row\.selected_obligation_id])}\</td>
+&#x20;       \<td>${formatDate(row\.created_at)}\</td>
+&#x20;       \<td>
+&#x20;         \<button class="action-btn view-btn" onclick="viewPayment('${row\.id}')">View\</button>
+&#x20;         \<button class="action-btn verify-btn" onclick="verifyPayment('${row\.id}')">Verify\</button>
+&#x20;         \<button class="action-btn reject-btn" onclick="openRejectModal('${row\.id}')">Reject\</button>
+&#x20;       \</td>
+&#x20;     \</tr>
+&#x20;   \`).join("");
 
-  } catch(error) {
-    console.error(error);
-    body.innerHTML = '<tr><td colspan="6" class="empty">Unable to load payment submissions. Check database access.</td></tr>';
-  }
+&#x20; } catch(error) {
+&#x20;   console.error(error);
+&#x20;   body.innerHTML = '\<tr>\<td colspan="6" class="empty">Unable to load payment submissions. Check database access.\</td>\</tr>';
+&#x20; }
 }
 
 function viewPayment(id) {
-  const row = paymentCache.find(p => p.id === id);
-  if (!row) return;
+&#x20; const row = paymentCache.find(p => p.id === id);
+&#x20; if (!row) return;
 
-  const originalMessage = row.original_message ?? "No original transaction message found.";
-  const member = memberCache[row.member_id] || "Member";
+&#x20; const originalMessage = row\.original_message ?? "No original transaction message found.";
+&#x20; const member = memberCache[row\.member_id] || "Member";
 
-  alert(
-    "PAYMENT DETAILS\n\n" +
-    "Member: " + member + "\n" +
-    "Amount: " + formatMoney(getPaymentAmount(row)) + "\n" +
-    "Transaction ID: " + getTransactionId(row) + "\n" +
-    "Selected obligation: " + row.selected_obligation_id + "\n" +
-    "Date submitted: " + formatDate(row.created_at) + "\n\n" +
-    "ORIGINAL TRANSACTION MESSAGE\n" + originalMessage
-  );
+&#x20; alert(
+&#x20;   "PAYMENT DETAILS\n\n" +
+&#x20;   "Member: " + member + "\n" +
+&#x20;   "Amount: " + formatMoney(getPaymentAmount(row)) + "\n" +
+&#x20;   "Transaction ID: " + getTransactionId(row) + "\n" +
+&#x20;   "Selected obligation: " + row\.selected_obligation_id + "\n" +
+&#x20;   "Date submitted: " + formatDate(row\.created_at) + "\n\n" +
+&#x20;   "ORIGINAL TRANSACTION MESSAGE\n" + originalMessage
+&#x20; );
 }
 
 async function verifyPayment(id) {
-  const row = paymentCache.find(p => p.id === id);
-  if (!row) return;
+&#x20; const row = paymentCache.find(p => p.id === id);
+&#x20; if (!row) return;
 
-  const proceed = confirm(
-    "Have you independently confirmed that this payment reached the official welfare account?\n\n" +
-    "The system will only allocate the payment after your confirmation."
-  );
-  if (!proceed) return;
+&#x20; const proceed = confirm(
+&#x20;   "Have you independently confirmed that this payment reached the official welfare account?\n\n" +
+&#x20;   "The system will only allocate the payment after your confirmation."
+&#x20; );
+&#x20; if (!proceed) return;
 
-  try {
-    const button = document.querySelector(`button[onclick="verifyPayment('${id}')"]`);
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Processing...";
-    }
+&#x20; try {
+&#x20;   const button = document.querySelector(\`button[onclick="verifyPayment('${id}')"]\`);
+&#x20;   if (button) {
+&#x20;     button.disabled = true;
+&#x20;     button.textContent = "Processing...";
+&#x20;   }
 
-    const {data,error} = await db.rpc("process_payment_submission",{
-      p_payment_id:id,
-      p_decision:"verify",
-      p_rejection_reason:null
-    });
+&#x20;   const {data,error} = await db.rpc("process_payment_submission",{
+&#x20;     p_payment_id:id,
+&#x20;     p_decision:"verify",
+&#x20;     p_rejection_reason:null
+&#x20;   });
 
-    if (error) throw error;
+&#x20;   if (error) throw error;
 
-    showToast("Payment verified and processed successfully.");
-    await Promise.all([loadPayments(),loadDashboard()]);
+&#x20;   showToast("Payment verified and processed successfully.");
+&#x20;   await Promise.all([loadPayments(),loadDashboard()]);
 
-  } catch(error) {
-    console.error(error);
-    showToast(error.message || "Payment verification failed.");
-    await loadPayments();
-  }
+&#x20; } catch(error) {
+&#x20;   console.error(error);
+&#x20;   showToast(error.message || "Payment verification failed.");
+&#x20;   await loadPayments();
+&#x20; }
 }
 
 function openRejectModal(id) {
-  pendingRejectId = id;
-  $("rejectionReason").value = "";
-  $("rejectModal").classList.add("show");
+&#x20; pendingRejectId = id;
+&#x20; $("rejectionReason").value = "";
+&#x20; $("rejectModal").classList.add("show");
 }
 
 function closeRejectModal() {
-  pendingRejectId = null;
-  $("rejectModal").classList.remove("show");
+&#x20; pendingRejectId = null;
+&#x20; $("rejectModal").classList.remove("show");
 }
 
 $("confirmRejectButton").addEventListener("click",async function() {
-  const reason = $("rejectionReason").value.trim();
-  if (!reason) {
-    showToast("Please provide a rejection reason.");
-    return;
-  }
-  if (!pendingRejectId) return;
+&#x20; const reason = $("rejectionReason").value.trim();
+&#x20; if (!reason) {
+&#x20;   showToast("Please provide a rejection reason.");
+&#x20;   return;
+&#x20; }
+&#x20; if (!pendingRejectId) return;
 
-  const id = pendingRejectId;
-  this.disabled = true;
-  this.textContent = "Processing...";
+&#x20; const id = pendingRejectId;
+&#x20; this.disabled = true;
+&#x20; this.textContent = "Processing...";
 
-  try {
-    const {error} = await db.rpc("process_payment_submission",{
-      p_payment_id:id,
-      p_decision:"reject",
-      p_rejection_reason:reason
-    });
-    if (error) throw error;
+&#x20; try {
+&#x20;   const {error} = await db.rpc("process_payment_submission",{
+&#x20;     p_payment_id:id,
+&#x20;     p_decision:"reject",
+&#x20;     p_rejection_reason:reason
+&#x20;   });
+&#x20;   if (error) throw error;
 
-    closeRejectModal();
-    showToast("Payment submission rejected.");
-    await Promise.all([loadPayments(),loadDashboard()]);
+&#x20;   closeRejectModal();
+&#x20;   showToast("Payment submission rejected.");
+&#x20;   await Promise.all([loadPayments(),loadDashboard()]);
 
-  } catch(error) {
-    console.error(error);
-    showToast(error.message || "Unable to reject payment.");
-  } finally {
-    this.disabled = false;
-    this.textContent = "Reject Payment";
-  }
+&#x20; } catch(error) {
+&#x20;   console.error(error);
+&#x20;   showToast(error.message || "Unable to reject payment.");
+&#x20; } finally {
+&#x20;   this.disabled = false;
+&#x20;   this.textContent = "Reject Payment";
+&#x20; }
 });
 
-/* CONTRIBUTION MANAGEMENT */
+/\* CONTRIBUTION MANAGEMENT \*/
 async function loadContributions() {
-  const body = $("contributionTable");
-  body.innerHTML = '<tr><td colspan="8" class="empty">Loading contribution records...</td></tr>';
+&#x20; const body = $("contributionTable");
+&#x20; body.innerHTML = '\<tr>\<td colspan="8" class="empty">Loading contribution records...\</td>\</tr>';
 
-  try {
-    const [obligationResult,profileResult,walletResult] = await Promise.all([
-      db.from("contribution_obligations")
-        .select("id,member_id,contribution_month,base_amount_due,penalty_amount_due,amount_due,amount_paid,status")
-        .order("contribution_month",{ascending:false}),
-      db.from("profiles").select("id,full_name"),
-      db.from("member_wallet_transactions")
-        .select("member_id,amount,direction")
-    ]);
+&#x20; try {
+&#x20;   const [obligationResult,profileResult,walletResult] = await Promise.all([
+&#x20;     db.from("contribution_obligations")
+&#x20;       .select("id,member_id,contribution_month,base_amount_due,penalty_amount_due,amount_due,amount_paid,status")
+&#x20;       .order("contribution_month",{ascending:false}),
+&#x20;     db.from("profiles").select("id,full_name"),
+&#x20;     db.from("member_wallet_transactions")
+&#x20;       .select("member_id,amount,direction")
+&#x20;   ]);
 
-    if (obligationResult.error) throw obligationResult.error;
-    if (profileResult.error) throw profileResult.error;
-    if (walletResult.error) throw walletResult.error;
+&#x20;   if (obligationResult.error) throw obligationResult.error;
+&#x20;   if (profileResult.error) throw profileResult.error;
+&#x20;   if (walletResult.error) throw walletResult.error;
 
-    obligationCache = obligationResult.data || [];
-    profileCache = profileResult.data || [];
+&#x20;   obligationCache = obligationResult.data || [];
+&#x20;   profileCache = profileResult.data || [];
 
-    const names = {};
-    profileCache.forEach(p => names[p.id] = p.full_name || "Unnamed member");
+&#x20;   const names = {};
+&#x20;   profileCache.forEach(p => names[p.id] = p.full_name || "Unnamed member");
 
-    populateContributionMonthFilter(obligationCache);
-    renderContributions(names);
-    renderContributionWallets(names,walletResult.data || []);
+&#x20;   populateContributionMonthFilter(obligationCache);
+&#x20;   renderContributions(names);
+&#x20;   renderContributionWallets(names,walletResult.data || []);
 
-  } catch(error) {
-    console.error("Contribution module:",error);
-    body.innerHTML = '<tr><td colspan="8" class="empty">Unable to load contribution records.</td></tr>';
-    showToast(error.message || "Unable to load contributions.");
-  }
+&#x20; } catch(error) {
+&#x20;   console.error("Contribution module:",error);
+&#x20;   body.innerHTML = '\<tr>\<td colspan="8" class="empty">Unable to load contribution records.\</td>\</tr>';
+&#x20;   showToast(error.message || "Unable to load contributions.");
+&#x20; }
 }
 
 function populateContributionMonthFilter(rows) {
-  const select = $("contributionMonthFilter");
-  const previous = select.value;
-  const months = [...new Set(rows.map(row => String(row.contribution_month).slice(0,10)))].sort().reverse();
+&#x20; const select = $("contributionMonthFilter");
+&#x20; const previous = select.value;
+&#x20; const months = [...new Set(rows.map(row => String(row\.contribution_month).slice(0,10)))].sort().reverse();
 
-  select.innerHTML = '<option value="all">All months</option>';
-  months.forEach(month => {
-    const option = document.createElement("option");
-    option.value = month;
-    option.textContent = formatMonth(month);
-    select.appendChild(option);
-  });
+&#x20; select.innerHTML = '\<option value="all">All months\</option>';
+&#x20; months.forEach(month => {
+&#x20;   const option = document.createElement("option");
+&#x20;   option.value = month;
+&#x20;   option.textContent = formatMonth(month);
+&#x20;   select.appendChild(option);
+&#x20; });
 
-  if (months.includes(previous)) select.value = previous;
+&#x20; if (months.includes(previous)) select.value = previous;
 }
 
 function renderContributions(names = {}) {
-  const selectedMonth = $("contributionMonthFilter").value;
-  const rows = obligationCache.filter(row =>
-    selectedMonth === "all" || String(row.contribution_month).slice(0,10) === selectedMonth
-  );
+&#x20; const selectedMonth = $("contributionMonthFilter").value;
+&#x20; const rows = obligationCache.filter(row =>
+&#x20;   selectedMonth === "all" || String(row\.contribution_month).slice(0,10) === selectedMonth
+&#x20; );
 
-  const expected = rows.reduce((sum,row) => sum + Number(row.amount_due || 0),0);
-  const collected = rows.reduce((sum,row) => sum + Number(row.amount_paid || 0),0);
-  const outstanding = rows.reduce((sum,row) =>
-    sum + Math.max(0,Number(row.amount_due || 0) - Number(row.amount_paid || 0)),0
-  );
+&#x20; const expected = rows.reduce((sum,row) => sum + Number(row\.amount_due || 0),0);
+&#x20; const collected = rows.reduce((sum,row) => sum + Number(row\.amount_paid || 0),0);
+&#x20; const outstanding = rows.reduce((sum,row) =>
+&#x20;   sum + Math.max(0,Number(row\.amount_due || 0) - Number(row\.amount_paid || 0)),0
+&#x20; );
 
-  $("contributionExpected").textContent = formatMoney(expected);
-  $("contributionCollected").textContent = formatMoney(collected);
-  $("contributionOutstanding").textContent = formatMoney(outstanding);
+&#x20; $("contributionExpected").textContent = formatMoney(expected);
+&#x20; $("contributionCollected").textContent = formatMoney(collected);
+&#x20; $("contributionOutstanding").textContent = formatMoney(outstanding);
 
-  if (!rows.length) {
-    $("contributionTable").innerHTML =
-      '<tr><td colspan="8" class="empty">No contribution obligations found for this selection.</td></tr>';
-    return;
-  }
+&#x20; if (!rows.length) {
+&#x20;   $("contributionTable").innerHTML =
+&#x20;     '\<tr>\<td colspan="8" class="empty">No contribution obligations found for this selection.\</td>\</tr>';
+&#x20;   return;
+&#x20; }
 
-  $("contributionTable").innerHTML = rows.map(row => {
-    const due = Number(row.amount_due || 0);
-    const paid = Number(row.amount_paid || 0);
-    const balance = Math.max(0,due-paid);
+&#x20; $("contributionTable").innerHTML = rows.map(row => {
+&#x20;   const due = Number(row\.amount_due || 0);
+&#x20;   const paid = Number(row\.amount_paid || 0);
+&#x20;   const balance = Math.max(0,due-paid);
 
-    return `
-      <tr>
-        <td><strong>${escapeHTML(names[row.member_id] || "Member")}</strong></td>
-        <td>${formatMonth(row.contribution_month)}</td>
-        <td>${formatMoney(row.base_amount_due)}</td>
-        <td>${formatMoney(row.penalty_amount_due)}</td>
-        <td>${formatMoney(due)}</td>
-        <td>${formatMoney(paid)}</td>
-        <td>${formatMoney(balance)}</td>
-        <td><span class="status ${escapeHTML(row.status)}">${escapeHTML(row.status)}</span></td>
-      </tr>
-    `;
-  }).join("");
+&#x20;   return \`
+&#x20;     \<tr>
+&#x20;       \<td>\<strong>${escapeHTML(names[row\.member_id] || "Member")}\</strong>\</td>
+&#x20;       \<td>${formatMonth(row\.contribution_month)}\</td>
+&#x20;       \<td>${formatMoney(row\.base_amount_due)}\</td>
+&#x20;       \<td>${formatMoney(row\.penalty_amount_due)}\</td>
+&#x20;       \<td>${formatMoney(due)}\</td>
+&#x20;       \<td>${formatMoney(paid)}\</td>
+&#x20;       \<td>${formatMoney(balance)}\</td>
+&#x20;       \<td>\<span class="status ${escapeHTML(row\.status)}">${escapeHTML(row\.status)}\</span>\</td>
+&#x20;     \</tr>
+&#x20;   \`;
+&#x20; }).join("");
 }
 
 function renderContributionWallets(names,transactions) {
-  const wallets = {};
+&#x20; const wallets = {};
 
-  transactions.forEach(transaction => {
-    const id = transaction.member_id;
-    if (!id) return;
+&#x20; transactions.forEach(transaction => {
+&#x20;   const id = transaction.member_id;
+&#x20;   if (!id) return;
 
-    if (!wallets[id]) wallets[id] = {credits:0,debits:0};
+&#x20;   if (!wallets[id]) wallets[id] = {credits:0,debits:0};
 
-    const amount = Number(transaction.amount || 0);
-    if (transaction.direction === "credit") wallets[id].credits += amount;
-    if (transaction.direction === "debit") wallets[id].debits += amount;
-  });
+&#x20;   const amount = Number(transaction.amount || 0);
+&#x20;   if (transaction.direction === "credit") wallets[id].credits += amount;
+&#x20;   if (transaction.direction === "debit") wallets[id].debits += amount;
+&#x20; });
 
-  const ids = Object.keys(wallets);
-  const totalWallet = ids.reduce((sum,id) =>
-    sum + Math.max(0,wallets[id].credits-wallets[id].debits),0
-  );
+&#x20; const ids = Object.keys(wallets);
+&#x20; const totalWallet = ids.reduce((sum,id) =>
+&#x20;   sum + Math.max(0,wallets[id].credits-wallets[id].debits),0
+&#x20; );
 
-  $("contributionWallet").textContent = formatMoney(totalWallet);
+&#x20; $("contributionWallet").textContent = formatMoney(totalWallet);
 
-  if (!ids.length) {
-    $("contributionWalletTable").innerHTML =
-      '<tr><td colspan="4" class="empty">No wallet transactions recorded yet.</td></tr>';
-    return;
-  }
+&#x20; if (!ids.length) {
+&#x20;   $("contributionWalletTable").innerHTML =
+&#x20;     '\<tr>\<td colspan="4" class="empty">No wallet transactions recorded yet.\</td>\</tr>';
+&#x20;   return;
+&#x20; }
 
-  $("contributionWalletTable").innerHTML = ids.map(id => {
-    const wallet = wallets[id];
-    const balance = wallet.credits-wallet.debits;
+&#x20; $("contributionWalletTable").innerHTML = ids.map(id => {
+&#x20;   const wallet = wallets[id];
+&#x20;   const balance = wallet.credits-wallet.debits;
 
-    return `
-      <tr>
-        <td><strong>${escapeHTML(names[id] || "Member")}</strong></td>
-        <td>${formatMoney(wallet.credits)}</td>
-        <td>${formatMoney(wallet.debits)}</td>
-        <td>${formatMoney(balance)}</td>
-      </tr>
-    `;
-  }).join("");
+&#x20;   return \`
+&#x20;     \<tr>
+&#x20;       \<td>\<strong>${escapeHTML(names[id] || "Member")}\</strong>\</td>
+&#x20;       \<td>${formatMoney(wallet.credits)}\</td>
+&#x20;       \<td>${formatMoney(wallet.debits)}\</td>
+&#x20;       \<td>${formatMoney(balance)}\</td>
+&#x20;     \</tr>
+&#x20;   \`;
+&#x20; }).join("");
 }
 
 $("contributionMonthFilter").addEventListener("change",() => {
-  const names = {};
-  profileCache.forEach(p => names[p.id] = p.full_name || "Unnamed member");
-  renderContributions(names);
+&#x20; const names = {};
+&#x20; profileCache.forEach(p => names[p.id] = p.full_name || "Unnamed member");
+&#x20; renderContributions(names);
 });
 
-/* WELFARE ACTIVITIES */
+/\* WELFARE ACTIVITIES \*/
 function formatWelfareMoney(amount) {
-  return "MWK " + Number(amount || 0).toLocaleString("en-US",{
-    minimumFractionDigits:0,maximumFractionDigits:2
-  });
+&#x20; return "MWK " + Number(amount || 0).toLocaleString("en-US",{
+&#x20;   minimumFractionDigits:0,maximumFractionDigits:2
+&#x20; });
 }
 
 function welfareStatusLabel(status) {
-  return String(status || "").replace(/_/g," ")
-    .replace(/\b\w/g,letter => letter.toUpperCase());
+&#x20; return String(status || "").replace(/\_/g," ")
+&#x20;   .replace(/\b\w/g,letter => letter.toUpperCase());
 }
 
 async function loadWelfareActivities() {
-  const tbody = $("activitiesTableBody");
-  if (!tbody) return;
+&#x20; const tbody = $("activitiesTableBody");
+&#x20; if (!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="5" class="empty">Loading activities...</td></tr>';
+&#x20; tbody.innerHTML = '\<tr>\<td colspan="5" class="empty">Loading activities...\</td>\</tr>';
 
-  try {
-    const {data,error} = await db.from("welfare_activities")
-      .select("*").order("created_at",{ascending:false});
+&#x20; try {
+&#x20;   const {data,error} = await db.from("welfare_activities")
+&#x20;     .select("\*").order("created_at",{ascending:false});
 
-    if (error) throw error;
+&#x20;   if (error) throw error;
 
-    activityCache = data || [];
-    $("activityTotal").textContent = activityCache.length;
-    $("activityOngoing").textContent =
-      activityCache.filter(a => a.status === "ongoing").length;
-    $("activityCompleted").textContent =
-      activityCache.filter(a => a.status === "completed").length;
+&#x20;   activityCache = data || [];
+&#x20;   $("activityTotal").textContent = activityCache.length;
+&#x20;   $("activityOngoing").textContent =
+&#x20;     activityCache.filter(a => a.status === "ongoing").length;
+&#x20;   $("activityCompleted").textContent =
+&#x20;     activityCache.filter(a => a.status === "completed").length;
 
-    renderWelfareActivities(activityCache);
-    populateExpenseActivities(activityCache);
-    await loadWelfareExpenses(activityCache);
+&#x20;   renderWelfareActivities(activityCache);
+&#x20;   populateExpenseActivities(activityCache);
+&#x20;   await loadWelfareExpenses(activityCache);
 
-  } catch(error) {
-    console.error("Welfare activities error:",error);
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">Unable to load activities.</td></tr>';
-    showToast(error.message || "Unable to load welfare activities.");
-  }
+&#x20; } catch(error) {
+&#x20;   console.error("Welfare activities error:",error);
+&#x20;   tbody.innerHTML = '\<tr>\<td colspan="5" class="empty">Unable to load activities.\</td>\</tr>';
+&#x20;   showToast(error.message || "Unable to load welfare activities.");
+&#x20; }
 }
 
 function renderWelfareActivities(activities) {
-  const tbody = $("activitiesTableBody");
+&#x20; const tbody = $("activitiesTableBody");
 
-  if (!activities.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">No welfare activities recorded yet.</td></tr>';
-    return;
-  }
+&#x20; if (!activities.length) {
+&#x20;   tbody.innerHTML = '\<tr>\<td colspan="5" class="empty">No welfare activities recorded yet.\</td>\</tr>';
+&#x20;   return;
+&#x20; }
 
-  tbody.innerHTML = activities.map(activity => `
-    <tr>
-      <td><strong>${escapeHTML(activity.title)}</strong></td>
-      <td>${escapeHTML(activity.category)}</td>
-      <td>${formatDate(activity.activity_date)}</td>
-      <td>${formatWelfareMoney(activity.budget_amount)}</td>
-      <td><span class="status ${escapeHTML(activity.status)}">${escapeHTML(welfareStatusLabel(activity.status))}</span></td>
-    </tr>
-  `).join("");
+&#x20; tbody.innerHTML = activities.map(activity => \`
+&#x20;   \<tr>
+&#x20;     \<td>\<strong>${escapeHTML(activity.title)}\</strong>\</td>
+&#x20;     \<td>${escapeHTML(activity.category)}\</td>
+&#x20;     \<td>${formatDate(activity.activity_date)}\</td>
+&#x20;     \<td>${formatWelfareMoney(activity.budget_amount)}\</td>
+&#x20;     \<td>\<span class="status ${escapeHTML(activity.status)}">${escapeHTML(welfareStatusLabel(activity.status))}\</span>\</td>
+&#x20;   \</tr>
+&#x20; \`).join("");
 }
 
 function populateExpenseActivities(activities) {
-  const select = $("expenseActivity");
-  const currentValue = select.value;
+&#x20; const select = $("expenseActivity");
+&#x20; const currentValue = select.value;
 
-  select.innerHTML = '<option value="">Select an activity</option>';
+&#x20; select.innerHTML = '\<option value="">Select an activity\</option>';
 
-  activities
-    .filter(activity => activity.status !== "draft" && activity.status !== "closed")
-    .forEach(activity => {
-      const option = document.createElement("option");
-      option.value = activity.id;
-      option.textContent = activity.title;
-      select.appendChild(option);
-    });
+&#x20; activities
+&#x20;   .filter(activity => activity.status !== "draft" && activity.status !== "closed")
+&#x20;   .forEach(activity => {
+&#x20;     const option = document.createElement("option");
+&#x20;     option.value = activity.id;
+&#x20;     option.textContent = activity.title;
+&#x20;     select.appendChild(option);
+&#x20;   });
 
-  if ([...select.options].some(option => option.value === currentValue)) {
-    select.value = currentValue;
-  }
+&#x20; if ([...select.options].some(option => option.value === currentValue)) {
+&#x20;   select.value = currentValue;
+&#x20; }
 }
 
 async function loadWelfareExpenses(activities = activityCache) {
-  const tbody = $("activityExpensesBody");
+&#x20; const tbody = $("activityExpensesBody");
 
-  try {
-    const {data,error} = await db.from("welfare_expenses")
-      .select("*").order("expense_date",{ascending:false});
+&#x20; try {
+&#x20;   const {data,error} = await db.from("welfare_expenses")
+&#x20;     .select("\*").order("expense_date",{ascending:false});
 
-    if (error) throw error;
+&#x20;   if (error) throw error;
 
-    const expenses = data || [];
-    const total = expenses.reduce((sum,item) => sum + Number(item.amount || 0),0);
-    $("activityExpenditure").textContent = formatWelfareMoney(total);
+&#x20;   const expenses = data || [];
+&#x20;   const total = expenses.reduce((sum,item) => sum + Number(item.amount || 0),0);
+&#x20;   $("activityExpenditure").textContent = formatWelfareMoney(total);
 
-    if (!expenses.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="empty">No expenditure records yet.</td></tr>';
-      return;
-    }
+&#x20;   if (!expenses.length) {
+&#x20;     tbody.innerHTML = '\<tr>\<td colspan="6" class="empty">No expenditure records yet.\</td>\</tr>';
+&#x20;     return;
+&#x20;   }
 
-    tbody.innerHTML = expenses.map(expense => {
-      const activity = activities.find(item => item.id === expense.activity_id);
-      return `
-        <tr>
-          <td>${formatDate(expense.expense_date)}</td>
-          <td>${escapeHTML(activity?.title || "Activity")}</td>
-          <td>${escapeHTML(expense.description)}</td>
-          <td>${escapeHTML(expense.paid_to || "—")}</td>
-          <td>${formatWelfareMoney(expense.amount)}</td>
-          <td>${escapeHTML(expense.receipt_reference || "—")}</td>
-        </tr>
-      `;
-    }).join("");
+&#x20;   tbody.innerHTML = expenses.map(expense => {
+&#x20;     const activity = activities.find(item => item.id === expense.activity_id);
+&#x20;     return \`
+&#x20;       \<tr>
+&#x20;         \<td>${formatDate(expense.expense_date)}\</td>
+&#x20;         \<td>${escapeHTML(activity?.title || "Activity")}\</td>
+&#x20;         \<td>${escapeHTML(expense.description)}\</td>
+&#x20;         \<td>${escapeHTML(expense.paid_to || "—")}\</td>
+&#x20;         \<td>${formatWelfareMoney(expense.amount)}\</td>
+&#x20;         \<td>${escapeHTML(expense.receipt_reference || "—")}\</td>
+&#x20;       \</tr>
+&#x20;     \`;
+&#x20;   }).join("");
 
-  } catch(error) {
-    console.error("Welfare expenses error:",error);
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">Unable to load expenditure records.</td></tr>';
-    showToast(error.message || "Unable to load welfare expenses.");
-  }
+&#x20; } catch(error) {
+&#x20;   console.error("Welfare expenses error:",error);
+&#x20;   tbody.innerHTML = '\<tr>\<td colspan="6" class="empty">Unable to load expenditure records.\</td>\</tr>';
+&#x20;   showToast(error.message || "Unable to load welfare expenses.");
+&#x20; }
 }
 
-/* CREATE ACTIVITY */
+/\* CREATE ACTIVITY \*/
 $("activityForm").addEventListener("submit",async function(event) {
-  event.preventDefault();
+&#x20; event.preventDefault();
 
-  const button = $("saveActivityBtn");
-  const message = $("activityFormMessage");
-  button.disabled = true;
-  button.textContent = "Saving...";
-  message.textContent = "";
+&#x20; const button = $("saveActivityBtn");
+&#x20; const message = $("activityFormMessage");
+&#x20; button.disabled = true;
+&#x20; button.textContent = "Saving...";
+&#x20; message.textContent = "";
 
-  try {
-    const {data:userData,error:userError} = await db.auth.getUser();
-    if (userError) throw userError;
-    if (!userData.user) throw new Error("Please sign in again.");
+&#x20; try {
+&#x20;   const {data:userData,error:userError} = await db.auth.getUser();
+&#x20;   if (userError) throw userError;
+&#x20;   if (!userData.user) throw new Error("Please sign in again.");
 
-    const activity = {
-      title:$("activityTitle").value.trim(),
-      category:$("activityCategory").value,
-      description:$("activityDescription").value.trim() || null,
-      activity_date:$("activityDate").value || null,
-      location:$("activityLocation").value.trim() || null,
-      budget_amount:Number($("activityBudget").value || 0),
-      status:$("activityStatus").value,
-      created_by:userData.user.id
-    };
+&#x20;   const activity = {
+&#x20;     title:$("activityTitle").value.trim(),
+&#x20;     category:$("activityCategory").value,
+&#x20;     description:$("activityDescription").value.trim() || null,
+&#x20;     activity_date:$("activityDate").value || null,
+&#x20;     location:$("activityLocation").value.trim() || null,
+&#x20;     budget_amount:Number($("activityBudget").value || 0),
+&#x20;     status:$("activityStatus").value,
+&#x20;     created_by:userData.user.id
+&#x20;   };
 
-    if (!activity.title || !activity.category) {
-      throw new Error("Please provide an activity title and category.");
-    }
-    if (!Number.isFinite(activity.budget_amount) || activity.budget_amount < 0) {
-      throw new Error("Please enter a valid budget.");
-    }
+&#x20;   if (!activity.title || !activity.category) {
+&#x20;     throw new Error("Please provide an activity title and category.");
+&#x20;   }
+&#x20;   if (!Number.isFinite(activity.budget_amount) || activity.budget_amount < 0) {
+&#x20;     throw new Error("Please enter a valid budget.");
+&#x20;   }
 
-    const {error} = await db.from("welfare_activities").insert(activity);
-    if (error) throw error;
+&#x20;   const {error} = await db.from("welfare_activities").insert(activity);
+&#x20;   if (error) throw error;
 
-    message.style.color = "green";
-    message.textContent = "Welfare activity saved successfully.";
+&#x20;   message.style.color = "green";
+&#x20;   message.textContent = "Welfare activity saved successfully.";
 
-    this.reset();
-    $("activityBudget").value = 0;
+&#x20;   this.reset();
+&#x20;   $("activityBudget").value = 0;
 
-    showToast("Welfare activity created.");
-    await loadWelfareActivities();
+&#x20;   showToast("Welfare activity created.");
+&#x20;   await loadWelfareActivities();
 
-  } catch(error) {
-    console.error(error);
-    message.style.color = "red";
-    message.textContent = error.message || "Unable to save activity.";
-    showToast(error.message || "Unable to save activity.");
-  } finally {
-    button.disabled = false;
-    button.textContent = "Save Activity";
-  }
+&#x20; } catch(error) {
+&#x20;   console.error(error);
+&#x20;   message.style.color = "red";
+&#x20;   message.textContent = error.message || "Unable to save activity.";
+&#x20;   showToast(error.message || "Unable to save activity.");
+&#x20; } finally {
+&#x20;   button.disabled = false;
+&#x20;   button.textContent = "Save Activity";
+&#x20; }
 });
 
-/* RECORD EXPENDITURE */
+/\* RECORD EXPENDITURE \*/
 $("activityExpenseForm").addEventListener("submit",async function(event) {
-  event.preventDefault();
+&#x20; event.preventDefault();
 
-  const button = $("saveExpenseBtn");
-  const message = $("expenseFormMessage");
-  button.disabled = true;
-  button.textContent = "Saving...";
-  message.textContent = "";
+&#x20; const button = $("saveExpenseBtn");
+&#x20; const message = $("expenseFormMessage");
+&#x20; button.disabled = true;
+&#x20; button.textContent = "Saving...";
+&#x20; message.textContent = "";
 
-  try {
-    const {data:userData,error:userError} = await db.auth.getUser();
-    if (userError) throw userError;
-    if (!userData.user) throw new Error("Please sign in again.");
+&#x20; try {
+&#x20;   const {data:userData,error:userError} = await db.auth.getUser();
+&#x20;   if (userError) throw userError;
+&#x20;   if (!userData.user) throw new Error("Please sign in again.");
 
-    const expense = {
-      activity_id:$("expenseActivity").value,
-      description:$("expenseDescription").value.trim(),
-      amount:Number($("expenseAmount").value),
-      expense_date:$("expenseDate").value,
-      paid_to:$("expensePaidTo").value.trim() || null,
-      receipt_reference:$("expenseReceipt").value.trim() || null,
-      recorded_by:userData.user.id
-    };
+&#x20;   const expense = {
+&#x20;     activity_id:$("expenseActivity").value,
+&#x20;     description:$("expenseDescription").value.trim(),
+&#x20;     amount:Number($("expenseAmount").value),
+&#x20;     expense_date:$("expenseDate").value,
+&#x20;     paid_to:$("expensePaidTo").value.trim() || null,
+&#x20;     receipt_reference:$("expenseReceipt").value.trim() || null,
+&#x20;     recorded_by:userData.user.id
+&#x20;   };
 
-    if (!expense.activity_id) throw new Error("Please select a welfare activity.");
-    if (!expense.description || !expense.expense_date ||
-        !Number.isFinite(expense.amount) || expense.amount <= 0) {
-      throw new Error("Please provide a valid description, date and amount.");
-    }
+&#x20;   if (!expense.activity_id) throw new Error("Please select a welfare activity.");
+&#x20;   if (!expense.description || !expense.expense_date ||
+&#x20;       !Number.isFinite(expense.amount) || expense.amount <= 0) {
+&#x20;     throw new Error("Please provide a valid description, date and amount.");
+&#x20;   }
 
-    const {error} = await db.from("welfare_expenses").insert(expense);
-    if (error) throw error;
+&#x20;   const {error} = await db.from("welfare_expenses").insert(expense);
+&#x20;   if (error) throw error;
 
-    message.style.color = "green";
-    message.textContent = "Expenditure recorded successfully.";
-    this.reset();
+&#x20;   message.style.color = "green";
+&#x20;   message.textContent = "Expenditure recorded successfully.";
+&#x20;   this.reset();
 
-    showToast("Welfare expenditure recorded.");
-    await loadWelfareActivities();
+&#x20;   showToast("Welfare expenditure recorded.");
+&#x20;   await loadWelfareActivities();
 
-  } catch(error) {
-    console.error(error);
-    message.style.color = "red";
-    message.textContent = error.message || "Unable to save expenditure.";
-    showToast(error.message || "Unable to record expenditure.");
-  } finally {
-    button.disabled = false;
-    button.textContent = "Save Expenditure";
-  }
+&#x20; } catch(error) {
+&#x20;   console.error(error);
+&#x20;   message.style.color = "red";
+&#x20;   message.textContent = error.message || "Unable to save expenditure.";
+&#x20;   showToast(error.message || "Unable to record expenditure.");
+&#x20; } finally {
+&#x20;   button.disabled = false;
+&#x20;   button.textContent = "Save Expenditure";
+&#x20; }
 });
 
-
-
-/* FINANCE & EXPENDITURE LEDGER */
-let financeCache = [];
-let reportCache = {headers:[],rows:[],title:"Report"};
-const FINANCE_CATEGORIES = {
-  income:["Donations","Interest","Fundraising","Refund","Other income"],
-  expenditure:["Medical support","Bereavement support","Transport","Food and refreshments","Venue and events","Administrative costs","Welfare assistance","Other expenditure"]
-};
-function setFinanceCategories(type,selected="") {
-  const select=$("financeCategory");
-  select.innerHTML='<option value="">Select category</option>'+FINANCE_CATEGORIES[type].map(v=>`<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join("");
-  if(selected) select.value=selected;
-}
-function populateFinanceCategoryFilter() {
-  const select=$("financeCategoryFilter"), previous=select.value;
-  const values=[...new Set(financeCache.map(x=>x.category).filter(Boolean))].sort();
-  select.innerHTML='<option value="all">All categories</option>'+values.map(v=>`<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join("");
-  if(values.includes(previous)) select.value=previous;
-}
-async function loadFinance() {
-  $("financeTable").innerHTML='<tr><td colspan="8" class="empty">Loading financial records...</td></tr>';
-  try {
-    const [summaryResult,recordsResult]=await Promise.all([
-      db.from("welfare_financial_summary").select("verified_contributions,other_income,total_expenditure,current_balance").single(),
-      db.from("welfare_financial_records").select("*").order("transaction_date",{ascending:false}).order("created_at",{ascending:false})
-    ]);
-    if(summaryResult.error) throw summaryResult.error;
-    if(recordsResult.error) throw recordsResult.error;
-    const summary=summaryResult.data||{};
-    $("finVerified").textContent=formatMoney(summary.verified_contributions);
-    $("finIncome").textContent=formatMoney(summary.other_income);
-    $("finExpense").textContent=formatMoney(summary.total_expenditure);
-    $("finBalance").textContent=formatMoney(summary.current_balance);
-    financeCache=recordsResult.data||[];
-    populateFinanceCategoryFilter();
-    renderFinanceHistory();
-  } catch(error) {
-    console.error("Finance module:",error);
-    $("financeTable").innerHTML='<tr><td colspan="8" class="empty">Unable to load finance records. Confirm that the financial tables, view and administrator permissions are available.</td></tr>';
-    showToast(error.message||"Unable to load finance records.");
-  }
-}
-function renderFinanceHistory() {
-  const type=$("financeTypeFilter").value, category=$("financeCategoryFilter").value;
-  const from=$("financeFrom").value, to=$("financeTo").value;
-  const rows=financeCache.filter(r=>(type==="all"||r.transaction_type===type)&&(category==="all"||r.category===category)&&(!from||r.transaction_date>=from)&&(!to||r.transaction_date<=to));
-  const body=$("financeTable");
-  if(!rows.length){body.innerHTML='<tr><td colspan="8" class="empty">No transactions match the selected filters.</td></tr>';return;}
-  body.innerHTML=rows.map(r=>`<tr>
-    <td>${formatDate(r.transaction_date)}</td><td><span class="status ${r.transaction_type==="income"?"verified":"rejected"}">${r.transaction_type==="income"?"Income":"Expenditure"}</span></td>
-    <td>${escapeHTML(r.category)}</td><td>${escapeHTML(r.description)}</td><td>${escapeHTML(r.party_name||"—")}</td>
-    <td class="${r.transaction_type==="income"?"fin-positive":"fin-negative"}">${formatMoney(r.amount)}</td><td>${r.receipt_url?`<a href="${escapeHTML(r.receipt_url)}" target="_blank" rel="noopener">${escapeHTML(r.receipt_url)}</a>`:"—"}</td>
-    <td><button class="action-btn view-btn" onclick="editFinanceRecord('${r.id}')">Edit</button><button class="action-btn reject-btn" onclick="deleteFinanceRecord('${r.id}')">Delete</button><button class="action-btn view-btn" onclick="shareFinanceRecord('${r.id}')">WhatsApp</button></td>
-  </tr>`).join("");
-}
-function clearFinanceFilters(){["financeTypeFilter","financeCategoryFilter"].forEach(id=>$(id).value="all");$("financeFrom").value="";$("financeTo").value="";renderFinanceHistory();}
-$("financeType").addEventListener("change",()=>setFinanceCategories($("financeType").value));
-$("financeForm").addEventListener("submit",async function(e){
-  e.preventDefault();const btn=$("saveFinanceBtn"),msg=$("financeFormMessage");btn.disabled=true;btn.textContent="Saving...";msg.textContent="";
-  try{
-    const {data:userData,error:userError}=await db.auth.getUser();if(userError)throw userError;if(!userData.user)throw new Error("Please sign in again.");
-    const id=$("financeRecordId").value;
-    const record={transaction_type:$("financeType").value,transaction_date:$("financeDate").value,category:$("financeCategory").value,amount:Number($("financeAmount").value),party_name:$("financeParty").value.trim()||null,description:$("financeDescription").value.trim(),authorised_by:$("financeAuthorised").value.trim()||null,receipt_url:$("financeReceipt").value.trim()||null};
-    if(!record.transaction_date||!record.category||!record.description||!Number.isFinite(record.amount)||record.amount<=0)throw new Error("Enter a valid date, category, description and amount greater than zero.");
-    let result;
-    if(id) result=await db.from("welfare_financial_records").update(record).eq("id",id);
-    else result=await db.from("welfare_financial_records").insert({...record,recorded_by:userData.user.id});
-    if(result.error)throw result.error;
-    msg.style.color="green";msg.textContent=id?"Financial record updated.":"Financial transaction saved.";
-    resetFinanceForm();showToast(id?"Financial record updated.":"Financial transaction recorded.");await loadFinance();
-  }catch(error){console.error(error);msg.style.color="red";msg.textContent=error.message||"Unable to save transaction.";showToast(error.message||"Unable to save transaction.");}
-  finally{btn.disabled=false;btn.textContent="Save Transaction";}
-});
-function resetFinanceForm(){$("financeForm").reset();$("financeRecordId").value="";$("financeDate").value=new Date().toLocaleDateString("en-CA");setFinanceCategories($("financeType").value);$("financeFormTitle").textContent="Record a Financial Transaction";$("saveFinanceBtn").textContent="Save Transaction";$("cancelFinanceEdit").classList.add("hidden");}
-function editFinanceRecord(id){const r=financeCache.find(x=>x.id===id);if(!r)return;$("financeRecordId").value=r.id;$("financeType").value=r.transaction_type;setFinanceCategories(r.transaction_type,r.category);$("financeDate").value=r.transaction_date;$("financeAmount").value=r.amount;$("financeParty").value=r.party_name||"";$("financeAuthorised").value=r.authorised_by||"";$("financeDescription").value=r.description;$("financeReceipt").value=r.receipt_url||"";$("financeFormTitle").textContent="Edit Financial Transaction";$("saveFinanceBtn").textContent="Update Transaction";$("cancelFinanceEdit").classList.remove("hidden");$("financeForm").scrollIntoView({behavior:"smooth",block:"start"});}
-$("cancelFinanceEdit").addEventListener("click",resetFinanceForm);
-async function deleteFinanceRecord(id){if(!confirm("Delete this financial record? This cannot be undone."))return;try{const {error}=await db.from("welfare_financial_records").delete().eq("id",id);if(error)throw error;showToast("Financial record deleted.");await loadFinance();}catch(error){showToast(error.message||"Unable to delete record.");}}
-function shareFinanceRecord(id){const r=financeCache.find(x=>x.id===id);if(!r)return;const msg=`Zomba Welfare Management – Financial transaction\nType: ${r.transaction_type}\nDate: ${formatDate(r.transaction_date)}\nCategory: ${r.category}\nAmount: ${formatMoney(r.amount)}\nDescription: ${r.description}\nParty: ${r.party_name||"—"}\nReference: ${r.receipt_url||"—"}`;window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank","noopener");}
-function printFinanceStatement(){window.print();}
-
-/* REPORTS & ANALYTICS */
-async function loadReportMembers(){
-  try{const {data,error}=await db.from("profiles").select("id,full_name").order("full_name");if(error)throw error;const sel=$("reportMember"),old=sel.value;sel.innerHTML='<option value="all">All members</option>'+(data||[]).map(p=>`<option value="${p.id}">${escapeHTML(p.full_name||"Unnamed member")}</option>`).join("");if((data||[]).some(p=>p.id===old))sel.value=old;}
-  catch(error){console.error(error);showToast("Unable to load member filter.");}
-}
-function inReportPeriod(date){const d=String(date||"").slice(0,10),from=$("reportFrom").value,to=$("reportTo").value;return (!from||d>=from)&&(!to||d<=to);}
-function reportMemberAllowed(id){const chosen=$("reportMember").value;return chosen==="all"||id===chosen;}
-function setReport(headers,rows,title,description,total){reportCache={headers,rows,title};$("reportTableTitle").textContent=title;$("reportTableDescription").textContent=description;$("reportRecordCount").textContent=rows.length;$("reportTotal").textContent=formatMoney(total||0);$("reportPeriod").textContent=($("reportFrom").value||"Start")+" to "+($("reportTo").value||"Present");$("reportGenerated").textContent=new Date().toLocaleDateString("en-GB");$("reportTableHead").innerHTML="<tr>"+headers.map(h=>`<th>${escapeHTML(h)}</th>`).join("")+"</tr>";$("reportTableBody").innerHTML=rows.length?rows.map(row=>"<tr>"+row.map(v=>`<td>${escapeHTML(v??"—")}</td>`).join("")+"</tr>").join(""):`<tr><td colspan="${headers.length}" class="empty">No records found for the selected filters.</td></tr>`;}
-async function generateReport(){
-  const btn=$("generateReportBtn"),msg=$("reportMessage");btn.disabled=true;btn.textContent="Generating...";msg.textContent="";
-  try{
-    const type=$("reportType").value,chosen=$("reportMember").value;
-    const [profilesR,obligationsR,paymentsR,activitiesR,expensesR,ledgerR]=await Promise.all([
-      db.from("profiles").select("id,full_name,phone_number"),
-      db.from("contribution_obligations").select("id,member_id,contribution_month,base_amount_due,penalty_amount_due,amount_due,amount_paid,status").order("contribution_month",{ascending:false}),
-      db.from("payment_submissions").select("id,member_id,transaction_id,transaction_date,amount,provider,status,created_at,selected_obligation_id,rejection_reason").order("created_at",{ascending:false}),
-      db.from("welfare_activities").select("id,title,category,description,activity_date,location,budget_amount,status,created_at").order("activity_date",{ascending:false}),
-      db.from("welfare_expenses").select("id,activity_id,description,amount,expense_date,paid_to,receipt_reference" ).order("expense_date",{ascending:false}),
-      db.from("welfare_financial_records").select("id,transaction_type,transaction_date,category,amount,party_name,description,authorised_by,receipt_url").order("transaction_date",{ascending:false})
-    ]);
-    for(const r of [profilesR,obligationsR,paymentsR,activitiesR,expensesR,ledgerR])if(r.error)throw r.error;
-    const profiles=profilesR.data||[],names={};profiles.forEach(p=>names[p.id]=p.full_name||"Unnamed member");
-    const obligations=obligationsR.data||[],payments=paymentsR.data||[],activities=activitiesR.data||[],expenses=expensesR.data||[],ledger=ledgerR.data||[];
-    let rows=[],headers=[],title="",desc="",total=0;
-    if(type==="contributions"){
-      const list=obligations.filter(r=>reportMemberAllowed(r.member_id)&&inReportPeriod(r.contribution_month));headers=["Member","Contribution month","Base due","Penalty","Total due","Paid","Outstanding","Status"];title="Contributions Report";desc="Monthly obligations and allocation status by member.";
-      rows=list.map(r=>[names[r.member_id],formatMonth(r.contribution_month),formatMoney(r.base_amount_due),formatMoney(r.penalty_amount_due),formatMoney(r.amount_due),formatMoney(r.amount_paid),formatMoney(Math.max(0,Number(r.amount_due)-Number(r.amount_paid))),r.status]);total=list.reduce((a,r)=>a+Number(r.amount_paid||0),0);
-    }else if(type==="payments"){
-      const list=payments.filter(r=>reportMemberAllowed(r.member_id)&&inReportPeriod(r.transaction_date||r.created_at));headers=["Member","Transaction ID","Transaction date","Provider","Amount","Status","Rejection reason"];title="Payment Report";desc="Member payment submissions, including pending, verified and rejected records.";
-      rows=list.map(r=>[names[r.member_id],r.transaction_id,formatDate(r.transaction_date||r.created_at),r.provider,formatMoney(r.amount),r.status,r.rejection_reason||"—"]);total=list.filter(r=>r.status==="verified").reduce((a,r)=>a+Number(r.amount||0),0);
-    }else if(type==="members"){
-      const list=profiles.filter(p=>chosen==="all"||p.id===chosen);headers=["Member","Phone","Months recorded","Fully paid months","Outstanding months","Total due","Total paid","Wallet credit"];
-      const walletR=await db.from("member_wallet_transactions").select("member_id,amount,direction");if(walletR.error)throw walletR.error;const wallet={};(walletR.data||[]).forEach(w=>{wallet[w.member_id]=(wallet[w.member_id]||0)+(w.direction==="credit"?1:-1)*Number(w.amount||0);});
-      title="Member Performance Report";desc="Contribution completion and wallet position for each registered member.";
-      rows=list.map(p=>{const own=obligations.filter(o=>o.member_id===p.id&&inReportPeriod(o.contribution_month));return [p.full_name||"Unnamed member",p.phone_number||"—",own.length,own.filter(o=>o.status==="paid").length,own.filter(o=>o.status!=="paid").length,formatMoney(own.reduce((a,o)=>a+Number(o.amount_due||0),0)),formatMoney(own.reduce((a,o)=>a+Number(o.amount_paid||0),0)),formatMoney(wallet[p.id]||0)];});total=obligations.filter(o=>inReportPeriod(o.contribution_month)&&(chosen==="all"||o.member_id===chosen)).reduce((a,o)=>a+Number(o.amount_paid||0),0);
-    }else if(type==="activities"){
-      const list=activities.filter(a=>inReportPeriod(a.activity_date||a.created_at));headers=["Activity","Category","Date","Location","Budget","Activity expenditure","Status"];title="Welfare Activities Report";desc="Activities and related activity-level expenses recorded in the Welfare Activities module.";
-      rows=list.map(a=>{const spent=expenses.filter(e=>e.activity_id===a.id&&inReportPeriod(e.expense_date)).reduce((n,e)=>n+Number(e.amount||0),0);return [a.title,a.category,formatDate(a.activity_date),a.location||"—",formatMoney(a.budget_amount),formatMoney(spent),a.status];});total=list.reduce((n,a)=>n+expenses.filter(e=>e.activity_id===a.id&&inReportPeriod(e.expense_date)).reduce((x,e)=>x+Number(e.amount||0),0),0);
-    }else if(type==="financial"){
-      const list=ledger.filter(r=>inReportPeriod(r.transaction_date));headers=["Date","Type","Category","Description","Party","Amount","Receipt / reference"];title="Financial Report";desc="Official finance ledger entries. Verified contributions are summarised separately below.";
-      rows=list.map(r=>[formatDate(r.transaction_date),r.transaction_type,r.category,r.description,r.party_name||"—",formatMoney(r.amount),r.receipt_url||"—"]);total=list.reduce((n,r)=>n+(r.transaction_type==="income"?1:-1)*Number(r.amount||0),0);
-    }else{
-      const byMonth={};const add=(month,key,amount)=>{if(!month)return;const k=String(month).slice(0,7);if(!byMonth[k])byMonth[k]={contributions:0,otherIncome:0,expenditure:0,verifiedPayments:0};byMonth[k][key]+=Number(amount||0);};
-      obligations.filter(r=>inReportPeriod(r.contribution_month)).forEach(r=>add(r.contribution_month,"contributions",r.amount_paid));
-      payments.filter(r=>r.status==="verified"&&inReportPeriod(r.transaction_date||r.created_at)).forEach(r=>add(r.transaction_date||r.created_at,"verifiedPayments",r.amount));
-      ledger.filter(r=>inReportPeriod(r.transaction_date)).forEach(r=>add(r.transaction_date,r.transaction_type==="income"?"otherIncome":"expenditure",r.amount));
-      const list=Object.entries(byMonth).sort((a,b)=>a[0].localeCompare(b[0]));headers=["Month","Allocated contribution payments","Verified payment submissions","Other income","Ledger expenditure","Net recorded movement"];title=type==="annual"?"Annual Summary Report":"Monthly Summary Report";desc="Monthly totals grouped by calendar year/month. Annual reports can be narrowed using the date filters.";
-      const grouped={};list.forEach(([m,v])=>{const y=m.slice(0,4);if(!grouped[y])grouped[y]={contributions:0,verifiedPayments:0,otherIncome:0,expenditure:0};Object.keys(grouped[y]).forEach(k=>grouped[y][k]+=v[k]);});
-      const finalList=type==="annual"?Object.entries(grouped).sort((a,b)=>a[0].localeCompare(b[0])).map(([y,v])=>[y,v]):list.map(([m,v])=>[formatMonth(m+"-01"),v]);
-      rows=finalList.map(([period,v])=>[period,formatMoney(v.contributions),formatMoney(v.verifiedPayments),formatMoney(v.otherIncome),formatMoney(v.expenditure),formatMoney(v.verifiedPayments+v.otherIncome-v.expenditure)]);total=finalList.reduce((n,[,v])=>n+v.verifiedPayments+v.otherIncome-v.expenditure,0);
-    }
-    setReport(headers,rows,title,desc,total);msg.style.color="green";msg.textContent="Report generated successfully.";
-  }catch(error){console.error("Report generation:",error);msg.style.color="red";msg.textContent=error.message||"Unable to generate report. Check database permissions.";showToast(error.message||"Unable to generate report.");}
-  finally{btn.disabled=false;btn.textContent="Generate report";}
-}
-function exportReportCSV(){if(!reportCache.rows.length){showToast("Generate a report before exporting.");return;}const quote=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv=[reportCache.headers,...reportCache.rows].map(row=>row.map(quote).join(",")).join("\r\n");const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=reportCache.title.toLowerCase().replace(/[^a-z0-9]+/g,"-")+".csv";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function printReport(){if(!reportCache.rows.length){showToast("Generate a report before printing.");return;}const active=$("section-reports");active.classList.add("print-report");window.print();active.classList.remove("print-report");}
-
-
-/* DEFAULT EXPENSE DATE */
+/\* DEFAULT EXPENSE DATE \*/
 $("expenseDate").value = new Date().toLocaleDateString("en-CA");
-$("financeDate").value = new Date().toLocaleDateString("en-CA");
-setFinanceCategories("income");
 
-/* SIGN OUT */
+/\* SIGN OUT \*/
 $("logoutButton").addEventListener("click",async function() {
-  const confirmed = confirm("Are you sure you want to sign out?");
-  if (!confirmed) return;
+&#x20; const confirmed = confirm("Are you sure you want to sign out?");
+&#x20; if (!confirmed) return;
 
-  const {error} = await db.auth.signOut();
-  if (error) {
-    showToast(error.message);
-    return;
-  }
-  window.location.replace("index.html");
+&#x20; const {error} = await db.auth.signOut();
+&#x20; if (error) {
+&#x20;   showToast(error.message);
+&#x20;   return;
+&#x20; }
+&#x20; window\.location.replace("index.html");
 });
 
-/* SESSION VALIDATION */
+/\* SESSION VALIDATION \*/
 db.auth.onAuthStateChange((event,session) => {
-  if (event === "SIGNED_OUT" || !session) {
-    window.location.replace("index.html");
-  }
+&#x20; if (event === "SIGNED_OUT" || !session) {
+&#x20;   window\.location.replace("index.html");
+&#x20; }
 });
 
 initialise();
-</script>
-</body>
-</html>
+\</script>
+\</body>
+\</html>
