@@ -76,8 +76,23 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
 .secondary-btn{background:#fff;border:1px solid var(--border);border-radius:9px;padding:11px 15px;font-size:12px}
 .wallet-number{font-size:28px;font-weight:800;color:var(--teal);margin:12px 0}
 .toast{position:fixed;bottom:20px;right:20px;background:#263b40;color:#fff;padding:13px 18px;border-radius:10px;font-size:12px;z-index:200;display:none;max-width:90%}
+ .activity-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+ .activity-card{background:#fff;border:1px solid var(--border);border-radius:15px;padding:19px;box-shadow:var(--shadow);min-width:0}
+ .activity-card h3{font-size:15px;line-height:1.45;margin:12px 0 8px}
+ .activity-card p{font-size:12px;line-height:1.7;color:#667176;margin:0 0 13px;overflow-wrap:anywhere}
+ .activity-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin:13px 0;color:#667176;font-size:11px}
+ .activity-meta span{display:inline-flex;align-items:center;gap:5px}
+ .activity-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+ .activity-category{font-size:10px;font-weight:700;color:var(--teal);background:#eaf3f4;padding:6px 9px;border-radius:20px}
+ .activity-status{font-size:10px;font-weight:700;padding:6px 9px;border-radius:20px;background:#f0f1f1;color:#687176}
+ .activity-status.upcoming{background:#eaf3f4;color:#226b78}
+ .activity-status.ongoing{background:#fff5df;color:#946408}
+ .activity-status.completed{background:#e7f5ed;color:#23834c}
+ .activity-description{white-space:pre-line}
+ .activity-empty{grid-column:1/-1;background:#fff;border:1px dashed #d9e1e3;border-radius:13px;padding:35px 18px;text-align:center;color:#788286;font-size:12px;line-height:1.8}
+ .activity-refresh{border:1px solid var(--border);background:#fff;color:var(--teal);padding:9px 12px;border-radius:9px;font-size:11px;font-weight:700}
 #mobileOverlay{display:none}
-@media(max-width:950px){.stats{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}}
+@media(max-width:950px){.stats{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}.activity-grid{grid-template-columns:1fr}}
 @media(max-width:700px){
 .sidebar{transform:translateX(-100%);transition:.25s;width:265px;box-shadow:var(--shadow)}
 .sidebar.open{transform:translateX(0)}
@@ -219,9 +234,14 @@ td{font-size:11px;padding:13px 9px;border-bottom:1px solid #f0f1f2}
 </section>
 
 <section class="section" id="page-activities">
- <h2 class="page-title">Welfare Activities</h2>
- <p class="page-subtitle">Updates and information about team welfare activities.</p>
- <div class="panel"><div class="empty">No welfare activities have been published yet.</div></div>
+ <div class="panel-heading" style="margin-bottom:7px"><div><h2 class="page-title" style="margin:0 0 7px">Welfare Activities</h2><p class="page-subtitle" style="margin:0">Activities and updates shared by your welfare administrator.</p></div><button class="activity-refresh" id="refreshActivitiesBtn" type="button">↻ Refresh</button></div>
+ <div class="stats" style="margin-top:19px">
+  <div class="stat"><div class="stat-top"><span class="stat-icon">▣</span></div><h3 id="activityTotal">0</h3><p>All activities</p></div>
+  <div class="stat"><div class="stat-top"><span class="stat-icon">◷</span></div><h3 id="activityUpcoming">0</h3><p>Upcoming</p></div>
+  <div class="stat"><div class="stat-top"><span class="stat-icon">♡</span></div><h3 id="activityOngoing">0</h3><p>Ongoing</p></div>
+  <div class="stat"><div class="stat-top"><span class="stat-icon">✓</span></div><h3 id="activityCompleted">0</h3><p>Completed</p></div>
+ </div>
+ <div class="activity-grid" id="activityList"><div class="activity-empty">Loading welfare activities...</div></div>
 </section>
 </main>
 </div>
@@ -239,6 +259,7 @@ let currentUser=null;
 let profile=null;
 let obligations=[];
 let payments=[];
+let activities=[];
 
 const $=id=>document.getElementById(id);
 const money=value=>'MWK '+Number(value||0).toLocaleString('en-US');
@@ -324,6 +345,7 @@ function bindNavigation(){
  });
 
  $('submitPaymentBtn').addEventListener('click',submitPayment);
+ $('refreshActivitiesBtn').addEventListener('click',loadActivities);
 }
 
 window.showPage=async page=>{
@@ -349,6 +371,7 @@ window.showPage=async page=>{
   await loadDashboard();
   populateMonths();
  }
+ if(page==='activities'){await loadActivities();}
 };
 
 window.toggleSidebar=()=>{
@@ -453,6 +476,50 @@ function renderWallet(rows){
    <td>${t.direction==='debit'?'−':'+'}${money(t.amount)}</td>
   </tr>`).join('')
  :'<tr><td colspan="3" class="empty">No wallet transactions yet.</td></tr>';
+}
+
+function activityStatus(activity){
+ const raw=String(activity.status||'upcoming').trim().toLowerCase();
+ if(['completed','complete','closed','done'].includes(raw))return 'completed';
+ if(['ongoing','in progress','in_progress','active'].includes(raw))return 'ongoing';
+ if(['upcoming','planned','scheduled','pending'].includes(raw))return 'upcoming';
+ return raw||'upcoming';
+}
+function activityStatusLabel(status){
+ return status.split(/[_\s]+/).map(word=>word?word[0].toUpperCase()+word.slice(1):'').join(' ')||'Upcoming';
+}
+function renderActivities(){
+ const counts={upcoming:0,ongoing:0,completed:0};
+ activities.forEach(a=>{const status=activityStatus(a);if(Object.prototype.hasOwnProperty.call(counts,status))counts[status]++;});
+ $('activityTotal').textContent=activities.length;
+ $('activityUpcoming').textContent=counts.upcoming;
+ $('activityOngoing').textContent=counts.ongoing;
+ $('activityCompleted').textContent=counts.completed;
+ const list=$('activityList');
+ if(!activities.length){list.innerHTML='<div class="activity-empty"><strong style="display:block;color:#44545a;margin-bottom:6px">No welfare activities yet</strong>When your administrator creates an activity, it will appear here automatically.</div>';return;}
+ list.innerHTML=activities.map(a=>{
+  const status=activityStatus(a);
+  const title=escapeHTML(a.title||'Welfare activity');
+  const category=escapeHTML(a.category||'General');
+  const description=escapeHTML(a.description||'No additional description has been provided.');
+  const location=escapeHTML(a.location||'Location to be announced');
+  const date=a.activity_date?dateText(a.activity_date):'Date to be announced';
+  return `<article class="activity-card"><div class="activity-top"><span class="activity-category">${category}</span><span class="activity-status ${escapeHTML(status)}">${escapeHTML(activityStatusLabel(status))}</span></div><h3>${title}</h3><div class="activity-meta"><span>▣ ${escapeHTML(date)}</span><span>⌖ ${location}</span></div><p class="activity-description">${description}</p></article>`;
+ }).join('');
+}
+async function loadActivities(){
+ const list=$('activityList');const button=$('refreshActivitiesBtn');
+ if(button){button.disabled=true;button.textContent='Loading...';}
+ if(list&&!activities.length)list.innerHTML='<div class="activity-empty">Loading welfare activities...</div>';
+ try{
+  const {data,error}=await db.from('welfare_activities').select('id,title,category,description,activity_date,location,status,created_at').order('activity_date',{ascending:true,nullsFirst:false}).order('created_at',{ascending:false});
+  if(error)throw error;
+  activities=data||[];renderActivities();
+ }catch(error){
+  console.error('Unable to load welfare activities:',error);
+  if(list)list.innerHTML=`<div class="activity-empty"><strong style="display:block;color:#a33;margin-bottom:6px">Unable to load activities</strong>${escapeHTML(error.message||'Please try again.')}</div>`;
+  toast('Could not load welfare activities.');
+ }finally{if(button){button.disabled=false;button.textContent='↻ Refresh';}}
 }
 
 function populateMonths(){
